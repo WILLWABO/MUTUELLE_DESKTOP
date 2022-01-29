@@ -75,7 +75,7 @@ class FileManager
             if ($user->avatar)
                 return self::loadImage($user->avatar,Yii::getAlias("@member_avatar_path"),$format);
             else
-                return Yii::getAlias('@web').'/img/member.png';
+                return Yii::getAlias('@web').'/img/members.png';
         }
     }
 
@@ -87,7 +87,7 @@ class FileManager
                 imagepng($img1024,$path);
                 break;
             case "JPG":
-                imagejpeg($img1024,$path);
+                imagejpg($img1024,$path);
                 break;
             case "JPEG":
                 imagejpeg($img1024,$path);
@@ -137,7 +137,7 @@ class FileManager
                 $src = imagecreatefrompng($link);
                 break;
             case "JPG":
-                $src = imagecreatefromjpeg($link);
+                $src = imagecreatefromjpg($link);
                 break;
             case "JPEG":
                 $src = imagecreatefromjpeg($link);

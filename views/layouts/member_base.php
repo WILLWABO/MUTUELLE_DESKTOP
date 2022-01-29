@@ -95,7 +95,7 @@ $this->title = "Mutuelle - ENSP";
                             <form action="<?= Yii::getAlias('@member.disconnection')?>" method="post" id="disconnection-form">
                                 <input type="hidden" name="<?=Yii::$app->request->csrfParam?>" value="<?=Yii::$app->request->csrfToken?>"/>
                             </form>
-                            <button type="button" class="btn btn-white" id="btn-disconnect" onclick="$('#disconnection-form').submit()">Déconnexion</button>
+                            <button type="button" class="btn btn-primary" id="btn-disconnect" onclick="$('#disconnection-form').submit()">Déconnexion</button>
                         </li>
                     </ul>
 

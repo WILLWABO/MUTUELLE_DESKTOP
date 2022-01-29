@@ -16,4 +16,16 @@ class HelpType extends ActiveRecord
     public function helps() {
         return Help::findAll(['help_type_id' => $this->id]);
     }
+
+    public static function getDb()
+    {
+        return \Yii::$app->db;
+    }
+
+    public function rules()
+    {
+        return [
+            ['title','unique']
+        ];
+    }
 }

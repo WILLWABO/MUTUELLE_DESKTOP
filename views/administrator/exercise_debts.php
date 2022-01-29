@@ -59,7 +59,7 @@ $refunds = \app\models\Refund::find()->where(['is not','exercise_id',null])->all
                                     <div class="modal-body">
                                         <p class="text-center p-3">Êtes-vous sûr(e) de vouloir enregistrer le fond social de ce membre?</p>
                                         <div class="text-center my-2">
-                                            <button class="btn btn-secondary" data-dismiss="modal">Non</button>
+                                            <button class="btn btn-danger" data-dismiss="modal">Non</button>
                                             <a href="<?= Yii::getAlias("@administrator.fix_social_crown")."?q=".$member->id?>"
                                                class="btn btn-primary">Oui</a>
                                         </div>

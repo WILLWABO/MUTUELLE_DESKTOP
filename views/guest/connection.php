@@ -107,7 +107,7 @@ Connexion
 
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <button class="btn btn-indigo" type="submit">Se connecter</button>
+                <button class="btn btn-primary" type="submit">Se connecter</button>
             </div>
         </form>
     </div>

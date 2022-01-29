@@ -75,7 +75,7 @@ Accueil
                                 <div class="modal-body">
                                     <p>Êtes-vous sûr(e) de vouloir passer aux remboursements?</p>
                                     <div class="mt-3">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Non
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Non
                                         </button>
                                         <a href="<?= Yii::getAlias("@administrator.go_to_refunds") . "?q=" . $session->id ?>"
                                            class="btn btn-primary">Oui</a>
@@ -260,7 +260,7 @@ Accueil
                             <?= $form->field($model, 'date')->input('date', ['required' => 'required'])->label("Date de la rencontre de la première session") ?>
 
                             <div class="form-group text-right">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
                                 <button type="submit" class="btn btn-primary">
                                     <?php if($exercise): ?>
                                         Créer la session

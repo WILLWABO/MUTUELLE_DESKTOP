@@ -34,7 +34,7 @@ Membres
                         <div class="card">
                             <!-- Card image -->
                             <div class="view overlay">
-                                <img class="card-img-top" src="<?= \app\managers\FileManager::loadAvatar($user,"512") ?>" style="height: 12rem" alt="Card image cap">
+                                <img class="card-img-top" src= "<?= \app\managers\FileManager::loadAvatar($user,"256") ?>" style="height: 12rem" alt="Card image cap">
                                 <a href="<?= Yii::getAlias("@administrator.member")."?q=".$member->id ?>">
                                     <div class="mask rgba-white-slight"></div>
                                 </a>

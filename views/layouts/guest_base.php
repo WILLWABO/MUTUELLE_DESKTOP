@@ -42,10 +42,10 @@ $this->title = "Mutuelle - ENSP"
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item <?= Yii::$app->controller->action->id == "accueil"?"active" : "" ?>">
                     <a class="nav-link"
-                       href="<?= Yii::getAlias("@guest.welcome") ?>">Accueil <span class="sr-only">(current)</span></a>
+                       href="<?= Yii::getAlias("@guest.welcome") ?>">ACCUEIL <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item <?= Yii::$app->controller->action->id != "accueil"? "active" : "" ?>">
-                    <a class="nav-link" href="<?= Yii::getAlias("@guest.connection") ?>">Connexion</a>
+                    <a class="nav-link" href="<?= Yii::getAlias("@guest.connection") ?>">CONNEXION</a>
                 </li>
             </ul>
         </div>

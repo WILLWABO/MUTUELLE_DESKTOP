@@ -34,7 +34,7 @@ $user = $member->user();
     <div class="row">
         <div class="col-md-4 text-center">
             <div class="img-container">
-                <img src="<?= \app\managers\FileManager::loadAvatar($user,"512")?>" alt="">
+                <img src="<?= \app\managers\FileManager::loadAvatar($user,"256")?>" alt="">
             </div>
             <h2 class="mt-2 text-capitalize"><?= $member->username?></h2>
         </div>
@@ -97,7 +97,7 @@ $user = $member->user();
                     <?php
                     if ($member->active):
                     ?>
-                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-primary p-2">Désactiver le membre</a>
+                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-danger p-2">Désactiver le membre</a>
                     <?php
                     else:
                     ?>

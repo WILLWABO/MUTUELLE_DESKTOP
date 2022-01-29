@@ -54,7 +54,7 @@ Epargnes
 
                                     <?= $form->field($model, 'session_id')->hiddenInput(['value' => $activeSession->id])->label(false) ?>
                                     <div class="form-group text-right">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler
                                         </button>
                                         <button type="submit" class="btn btn-primary">Ajouter</button>
                                     </div>
@@ -130,7 +130,7 @@ Epargnes
                                                             Êtes-vous sûr(e) de vouloir supprimer cette épargne?
                                                         </p>
                                                         <div class="text-center">
-                                                            <button data-dismiss="modal" class="btn btn-secondary">non</button>
+                                                            <button data-dismiss="modal" class="btn btn-danger">non</button>
                                                             <a href="<?= Yii::getAlias("@administrator.delete_saving")."?q=".$saving->id?>" class="btn btn-primary">oui</a>
                                                         </div>
                                                     </div>

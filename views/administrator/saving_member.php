@@ -90,7 +90,7 @@ $user = $member->user();
                     <?php
                     if ($member->active):
                         ?>
-                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-primary p-2">Désactiver le membre</a>
+                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-danger p-2">Désactiver le membre</a>
                     <?php
                     else:
                         ?>

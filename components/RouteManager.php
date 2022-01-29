@@ -24,7 +24,7 @@ class RouteManager {
         'administrator.profile' => '/administrator/profil',
         'administrator.update_profile' => '/administrator/modifier-profil',
         'administrator.update_social_information' => '/administrator/modifier-information-sociale',
-        'administrator.update_password' => '/administrator/modifier-mot-de-passe',
+        //'administrator.update_password' => '/administrator/modifier-mot-de-passe',
 
         'administrator.help_types' => '/administrator/types-aide',
         'administrator.new_help_type' => '/administrator/nouveau-type-aide',
@@ -108,8 +108,8 @@ class RouteManager {
     ];
 
     private $paths = [
-        'admin_avatar_path' => '/avatar/admin/',
-        'member_avatar_path' => '/avatar/member/'
+        'admin_avatar_path' => '/storage/avatar/admin/',
+        'member_avatar_path' => '/storage/avatar/member/'
     ];
 
     public function __construct()
