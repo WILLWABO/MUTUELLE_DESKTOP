@@ -13,7 +13,7 @@ $this->beginBlock('style')
     }
 </style>
 <?php $this->endBlock() ?>
-<h1 class="title">Vous êtes un membre de la mutuelle !!!</h1>
+<h1 class="title">Vous êtes un  de la mutuelle !!!</h1>
 <div>
     <?php
     $administrator = $member->administrator();

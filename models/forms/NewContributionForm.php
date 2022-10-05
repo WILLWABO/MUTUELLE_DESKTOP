@@ -16,13 +16,17 @@ class NewContributionForm extends Model
     public $member_id;
     public $date;
     public $help_id;
+    public $session_id;
+    
 
     public function rules()
     {
         return [
             [['member_id','help_id'],'integer','min' => 1,'message' => 'Ce champ attend un entier positif'],
             ['date','datetime','format' => 'yyyy-M-d','message' => 'Ce champ attend une date'],
-            [['help_id','date','member_id'],'required','message' => 'Ce champ est obligatoire']
+            [['help_id','date','member_id'],'required','message' => 'Ce champ est obligatoire'],
+            ['session_id','integer', 'min'=>0,'message' => 'Ce champ est obligatoire'],
+            ['session_id','required','message' => 'Ce champ est obligatoire']
         ];
     }
 }

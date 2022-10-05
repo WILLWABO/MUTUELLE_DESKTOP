@@ -17,6 +17,14 @@ class NewSessionForm extends Model
     public $year;
     public $date;
 
+    public function attributeLabels()
+    {
+        return [
+            'year' => 'année',
+
+        ];
+    }
+
     public function rules()
     {
         if (Exercise::findOne(['active' => true]))

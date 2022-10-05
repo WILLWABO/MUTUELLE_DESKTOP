@@ -1,7 +1,7 @@
 <?php use yii\widgets\LinkPager;
 
 $this->beginBlock('title') ?>
-Epargnes
+Épargnes
 <?php $this->endBlock() ?>
 <?php $this->beginBlock('style') ?>
 <style>
@@ -50,7 +50,7 @@ Epargnes
                                     ]) ?>
                                     <?= $form->field($model, 'member_id')->dropDownList($items)->label("Membre") ?>
 
-                                    <?= $form->field($model, "amount")->label("Montant")->input("number", ['required' => 'required']) ?>
+                                    <?= $form->field($model, "amount")->label("Montant")->input("number", ['required' => 'required', 'min'=>0]) ?>
 
                                     <?= $form->field($model, 'session_id')->hiddenInput(['value' => $activeSession->id])->label(false) ?>
                                     <div class="form-group text-right">

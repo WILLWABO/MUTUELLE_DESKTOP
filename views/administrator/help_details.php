@@ -66,7 +66,6 @@ $helpType = $help->helpType();
 <div class="container mb-5 mt-5">
     <div class="row">
         <div class="col-12 white-block">
-
             <div class="row mb-5 justify-content-center">
                 <div class="col-md-4 text-center">
                     <h3 class="mb-2">Membre</h3>
@@ -74,7 +73,6 @@ $helpType = $help->helpType();
                         <img src="<?= \app\managers\FileManager::loadAvatar($user,"512") ?>" alt="">
                     </div>
                     <h2 class="text-primary"><?= $user->name." ".$user->first_name ?></h2>
-
                 </div>
                 <div class="col-md-8 text-center">
                     <h4 class="text-center text-muted"><?= $helpType->title ?></h4>
@@ -86,24 +84,19 @@ $helpType = $help->helpType();
                     <p class="contributed text-secondary"><?= ($t=$help->contributedAmount())?$t:0 ?> XAF</p>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-12">
                     <h3 class="text-muted text-center">Détails</h3>
-                    <?php
-                    $contributions = $help->contributions();
-                    if (count($contributions)):
-                    ?>
-
+                    <?php $contributions = $help->contributions();?>
+                    <?php if (count($contributions)):?>
                         <table class="table table-hover">
                             <thead class="blue-grey lighten-4">
-                            <tr>
-                                <th>#</th>
-                                <th>Membre</th>
-                                <th>Date</th>
-                                <th>Administrateur</th>
-                            </tr>
-
+                                <tr>
+                                    <th>#</th>
+                                    <th>Membre</th>
+                                    <th>Date</th>
+                                    <th>Administrateur</th>
+                                </tr>
                             </thead>
                             <tbody>
                             <?php foreach ($contributions as $index => $contribution): ?>
@@ -112,34 +105,52 @@ $helpType = $help->helpType();
                                 $administrator = $contribution->administrator();
                                 $adminUser = $administrator->user();
                                 ?>
-                                <tr>
-                                    <th scope="row"><?= $index + 1 ?></th>
-                                    <td class="text-capitalize"><?= $u->name . " " . $u->first_name ?></td>
-                                    <td class="blue-text"><?= (new DateTime($contribution->date))->format("d-m-Y")  ?></td>
-                                    <td class="text-capitalize"><?= $adminUser->name. ' '.$adminUser->first_name ?></td>
-                                </tr>
+                                <?php $session = \app\models\Session::findOne(['active'=>true, 'id'=>$contribution->session_id]) ?>
+                                <?php if ( is_object($session) && $session->active && $session->state == "REFLOATING"):?>
+                                    <tr data-target="#modalS<?= $contribution->id?>" data-toggle="modal">
+                                        <th scope="row"><?= $index + 1 ?></th>
+                                        <td class="text-capitalize"><?= $u->name . " " . $u->first_name ?></td>
+                                        <td class="blue-text"><?= (new DateTime($contribution->date))->format("d-m-Y")  ?></td>
+                                        <td class="text-capitalize"><?= $adminUser->name. ' '.$adminUser->first_name ?></td>
+                                    </tr>
+                                    <div class="modal fade" id="modalS<?= $contribution->id ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-body">
+                                                    <p class="p-1 text-center">Êtes-vous sûr(e) de vouloir supprimer cette contribution?</p>
+                                                    <div class="text-center">
+                                                        <button data-dismiss="modal" class="btn btn-danger">non</button>
+                                                            <a href="<?= Yii::getAlias("@administrator.delete_contribution")."?q=".$contribution->id?>" class="btn btn-primary">oui</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php else:?>
+                                    <tr> 
+                                        <th scope="row"><?= $index + 1 ?></th>
+                                        <td class="text-capitalize"><?= $u->name . " " . $u->first_name ?></td>
+                                        <td class="blue-text"><?= (new DateTime($contribution->date))->format("d-m-Y")  ?></td>
+                                        <td class="text-capitalize"><?= $adminUser->name. ' '.$adminUser->first_name ?></td>
+                                    </tr>
+                                <?php endif;?>
                             <?php endforeach; ?>
                             </tbody>
                         </table>
 
-                    <?php
-                    else:?>
-                    <p class="text-center">Aucune contribution</p>
-                    <?php
-                    endif;
-                    ?>
-
-                    <?php
-                    if ($help->state):
-                    ?>
+                    <?php else:?>
+                        <p class="text-center">Aucune contribution</p>
+                    <?php endif; ?>
+                    
+                    <?php if ($help->state): ?>
                         <h3 class="text-muted text-center mb-3">Membres n'ayant pas contribué</h3>
+                        <div class="col-12 text-center">
                         <div class="row">
                             <?php
                             foreach ($help->waitedContributions() as $contribution ):
                             $member =$contribution->member();
                             $user = $member->user();
                             ?>
-
                             <div class="col-3">
                                 <div class="contribution">
                                     <img src="<?= \app\managers\FileManager::loadAvatar($user)?>" alt="<?= $user->name.' '.$user->first_name ?>">

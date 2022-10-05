@@ -13,11 +13,14 @@ class m201227_125715_seed_help_types extends Migration
 
     private $helps = [
         'Membre malade' => 200000,
+        'Naissance' => 50000,
         'Décès d\'un membre' => 1000000,
-        'Décès du parent d\'un membre' => 200000,
-        'Décès de l\'enfant d\'un membre' =>500000,
-        'Mariage d\'un membre' => 500000,
-        'Mariage dans la famille d\'un membre' => 200000
+        'Décès du parent d\'un membre' => 0,
+        'Décès de l\'enfant d\'un membre' =>300000,
+        'Décès conjoint' =>500000,
+        'Départ à la retraite' =>500000,
+        'Mariage d\'un membre' => 100000,
+        'Promotion d\'un membre' => 50000,
     ];
 
     public function safeUp()

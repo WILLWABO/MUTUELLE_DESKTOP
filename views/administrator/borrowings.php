@@ -1,7 +1,7 @@
 <?php use yii\widgets\LinkPager;
 
 $this->beginBlock('title') ?>
-    Epargnes
+    Épargnes
 <?php $this->endBlock() ?>
 <?php $this->beginBlock('style') ?>
     <style>
@@ -106,7 +106,7 @@ $this->beginBlock('title') ?>
                                 <th>Membre</th>
                                 <th>Montant</th>
                                 <th>Intérêt</th>
-                                <th>Net à payer</th>
+                                <th>Net à rembourser</th>
                                 <th>Administrateur</th>
                             </tr>
 
@@ -125,7 +125,7 @@ $this->beginBlock('title') ?>
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td class="text-capitalize"><?= $memberUser->name . " " . $memberUser->first_name ?></td>
                                     <td class="blue-text"><?= $borrowing->amount ?> XAF</td>
-                                    <td><?= $borrowing->interest ?> %</td>
+                                    <td><?= $borrowing->interest*3 ?> %</td>
                                     <td><?= $borrowing->intendedAmount() ?> XAF</td>
                                     <td class="text-capitalize"><?= $administratorUser->name . " " . $administratorUser->first_name ?></td>
                                 </tr>
@@ -156,7 +156,7 @@ $this->beginBlock('title') ?>
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td class="text-capitalize"><?= $memberUser->name . " " . $memberUser->first_name ?></td>
                                     <td class="blue-text"><?= $borrowing->amount ?> XAF</td>
-                                    <td><?= $borrowing->interest ?> %</td>
+                                    <td><?= $borrowing->interest*3 ?> %</td>
                                     <td><?= $borrowing->intendedAmount() ?> XAF</td>
                                     <td class="text-capitalize"><?= $administratorUser->name . " " . $administratorUser->first_name ?></td>
                                 </tr>

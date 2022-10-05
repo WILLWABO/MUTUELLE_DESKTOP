@@ -17,12 +17,20 @@ class NewRefundForm extends Model
     public $amount;
     public $session_id;
 
+    public function attributeLabels()
+    {
+        return [
+            'amount' => 'Montant',
+
+        ];
+    }
+
     public function rules()
     {
         return [
             [['member_id','amount','session_id' ],'required','message' => 'Ce champ est obligatoire'],
-            [['member_id','session_id'],'integer','min' => 1,'message' => 'Ce champ attend un entier positif'],
-            ['amount','integer','min' => 1,'message' => 'Ce champ attend un réel positif']
+            [['member_id','session_id'],'integer','min' => 0,'message' => 'Ce champ attend un entier positif'],
+            ['amount','integer','min' => 0,'message' => 'Ce champ attend un réel positif']
         ];
     }
 

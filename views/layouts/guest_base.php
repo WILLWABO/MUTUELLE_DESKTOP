@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-$this->title = "Mutuelle - ENSP"
+$this->title = "Mutuelle - ENSPY"
 ?>
 
 <?php $this->beginPage() ?>
@@ -32,7 +32,7 @@ $this->title = "Mutuelle - ENSP"
     <nav class="navbar navbar-expand-lg navbar-fixed-top px-md-5 p-1" id="navbar">
         <a href="<?= Yii::getAlias("@guest.welcome") ?>" class="navbar-brand text-white"><img
                     src="<?= Yii::getAlias("@web") . "/img/icon.png" ?>" id="icon" alt="ensp"> <span
-                    class="d-none d-md-inline">ENSP</span></a>
+                    class="d-none d-md-inline">ENSPY</span></a>
 
         <button class="navbar-toggler navbar-light" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

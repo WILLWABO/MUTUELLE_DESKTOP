@@ -19,13 +19,13 @@ class FileManager
     static $format = [256,512,1024];
 
     public static function getWeb() {
-        return Yii::getAlias("@web").'/storage';
+        return Yii::getAlias("@web");
     }
     public static function getBase() {
-        return Yii::$app->getBasePath().'/storage';
+        return Yii::getAlias("@web").'/storage';
     }
 
-    public static function storeImage(UploadedFile $image,$path,$name) {
+    /*public static function storeImage(UploadedFile $image,$path,$name) {
         if ($path[strlen($path)-1] != '/' )
             $path .= '/';
         $link = self::getBase().$path.$name.'.'.$image->getExtension();
@@ -36,13 +36,15 @@ class FileManager
             self::put_image($image,$item,$link,$path,$name.'.'.$image->getExtension());
         }
         return $name.'.'.$image->getExtension();
-    }
+    }*/
 
-    public static function loadImage($file_name,$path,$format="") {
-        if ($path[strlen($path)-1] != '/' )
-            $path .= '/';
-
-        return self::getWeb().$path. ($format!=""?$format."/":"") .$file_name;
+    public static function loadImage($path) {
+        if(!$path == null){
+            return self::getWeb().'/img/upload/'.$path;
+        }else{
+            return self::getWeb(). 'img/members.png';
+        }
+        
     }
 
     public static function deleteImage($file_name,$path) {
@@ -83,16 +85,19 @@ class FileManager
         $img1024 = self::resize_image($image,$link,$size,$size);
         $path = self::getBase().$path.$size."/".$name;
         switch (strtoupper($image->getExtension()) ) {
-            case "PNG":
+            case "png":
                 imagepng($img1024,$path);
                 break;
-            case "JPG":
+            case "jpg":
                 imagejpg($img1024,$path);
                 break;
-            case "JPEG":
+            case "jfif":
+                imagejfif($img1024,$path);
+                break;
+            case "jpeg":
                 imagejpeg($img1024,$path);
                 break;
-            case "GIF":
+            case "gif":
                 imagegif($img1024,$path);
                 break;
             default:
@@ -133,16 +138,19 @@ class FileManager
 
 
         switch (strtoupper($file->getExtension())) {
-            case "PNG" :
+            case "png" :
                 $src = imagecreatefrompng($link);
                 break;
-            case "JPG":
+            case "jpg":
                 $src = imagecreatefromjpg($link);
                 break;
-            case "JPEG":
+            case "jfif":
+                $src = imagecreatefromjfif($link);
+                break;
+            case "jpeg":
                 $src = imagecreatefromjpeg($link);
                 break;
-            case "GIF":
+            case "gif":
                 $src = imagecreatefromgif($link);
                 break;
             default:

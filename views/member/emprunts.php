@@ -48,7 +48,7 @@ Mes emprunts
                             <th>#</th>
                             <th>Montant emprunté</th>
                             <th>Intérêt</th>
-                            <th>Montant total</th>
+                            <th>Montant à rembourser</th>
                             <th>Montant remboursé</th>
                             <th>Montant restant</th>
                             <th>Administrateur</th>
@@ -70,7 +70,7 @@ Mes emprunts
                                 <tr>
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td class="blue-text"><?= $amount ? $amount : 0 ?> XAF</td>
-                                    <td><?= $interest ?> %</td>
+                                    <td><?= $interest*3 ?> %</td>
                                     <td><?= $intendedAmount?$intendedAmount:0 ?> XAF</td>
                                     <td><?= $refundedAmount?$refundedAmount:0 ?> XAF</td>
                                     <td class="text-secondary"><?= $rest?$rest:0 ?> XAF</td>

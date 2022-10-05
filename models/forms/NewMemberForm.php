@@ -21,14 +21,17 @@ class NewMemberForm extends Model
     public $address;
     public $avatar;
     public $password;
+    public $session_id;
 
     public function rules()
     {
         return [
             [['username','name','first_name','tel','password','email','address'],'string','message' => 'Ce champ attend du texte'],
-            [['username','name','first_name','tel','password','email','address'],'required','message' => 'Ce champ est obligatoire'],
+            [['username','name','first_name','tel','password','email'],'required','message' => 'Ce champ est obligatoire'],
             [['email'],'email','message' => 'Ce champ attend un email'],
             [['avatar'],'image','message' => 'Ce champ attend une image'],
+            ['session_id','integer', 'min'=>0,'message' => 'Ce champ est obligatoire'],
+            ['session_id','required','message' => 'Ce champ est obligatoire'],
         ];
     }
 }

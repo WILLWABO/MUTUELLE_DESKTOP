@@ -70,6 +70,10 @@ class MemberSessionManager
         return \Yii::$app->session->get(self::head) == "epargnes";
     }
 
+    public static function isTontines() {
+        return \Yii::$app->session->get(self::head) == "tontine_member";
+    }
+
     public static function isEmprunts() {
         return \Yii::$app->session->get(self::head) == "emprunts";
     }

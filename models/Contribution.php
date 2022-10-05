@@ -16,11 +16,17 @@ class Contribution extends ActiveRecord
     public function member() {
         return Member::findOne($this->member_id);
     }
+
     public function administrator() {
         return Administrator::findOne($this->administrator_id);
     }
+
     public function help() {
         return Help::findOne($this->help_id);
+    }
+
+    public function session() {
+        return Session::findOne($this->session_id);
     }
 
 }

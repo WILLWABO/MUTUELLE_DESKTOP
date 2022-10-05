@@ -33,7 +33,7 @@ Type d'aide
             <?php \yii\widgets\ActiveForm::end()?>
 
             <div class="text-right">
-                <button class="btn btn-danger" onclick="$('#form2').submit()">Supprimer</button>
+                <button class="btn btn-secondary" onclick="$('#form2').submit()">Supprimer</button>
                 <button class="btn btn-primary" onclick="$('#form1').submit()">Modifier</button>
             </div>
 

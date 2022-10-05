@@ -15,32 +15,40 @@ Nouveau membre
 
 
 <div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <h3 class="col-12 text-center text-muted mb-3">
-            Nouveau membre
-        </h3>
-        <?php $form = \yii\widgets\ActiveForm::begin([
-            'method' => 'post',
-            'action' => '@administrator.add_member',
-            'scrollToError' => true,
-            'errorCssClass' =>'text-secondary',
-            'options' => ['enctype' => 'multipart/form-data','class' => 'col-md-8 col-12 form-block'],
-        ]); ?>
+<?php $activeSession = \app\models\Session::findOne(['active' => true]); ?>
+    <?php if(is_object($activeSession)): ?>
+        <div class="row justify-content-center">
+            <h3 class="col-12 text-center text-muted mb-3">
+                Nouveau membre
+            </h3>
+            <?php $form = \yii\widgets\ActiveForm::begin([
+                'method' => 'post',
+                'action' => '@administrator.add_member',
+                'scrollToError' => true,
+                'errorCssClass' =>'text-secondary',
+                'options' => ['enctype' => 'multipart/form-data','class' => 'col-md-8 col-12 form-block'],
+            ]); ?>
 
-        <?= $form->field($model,'username')->label('Nom d\'utilisateur') ?>
-        <?= $form->field($model,'first_name')->label('Prénom') ?>
-        <?= $form->field($model,'name')->label('Nom') ?>
-        <?= $form->field($model,'tel')->input('tel')->label('Téléphone') ?>
-        <?= $form->field($model,'email')->input('email')->label('Email') ?>
-        <?= $form->field($model,'address')->input('address')->label('Adresse') ?>
-        <?= $form->field($model,'avatar')->fileInput(['accept' => 'jpg,jpeg,png,gif'])->label('Photo de profil')?>
-        <?= $form->field($model,'password')->input('password')->label('Mot de passe') ?>
+            <?= $form->field($model,'username')->label('Nom d\'utilisateur') ?>
+            <?= $form->field($model,'first_name')->label('Prénom') ?>
+            <?= $form->field($model,'name')->label('Nom') ?>
+            <?= $form->field($model,'tel')->input('tel')->label('Téléphone') ?>
+            <?= $form->field($model,'email')->input('email')->label('Email') ?>
+            <?= $form->field($model,'address')->input('address')->label('Adresse') ?>
+            <?= $form->field($model,'avatar')->fileInput();?>
+            <?= $form->field($model,'password')->input('password')->label('Mot de passe') ?>
+            <?= $form->field($model, 'session_id')->hiddenInput(['value' => $activeSession->id])->label(false) ?>
 
-        <div class="form-group text-right">
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <div class="form-group text-right">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+            <?php \yii\widgets\ActiveForm::end()?>
+
         </div>
-        <?php \yii\widgets\ActiveForm::end()?>
-
-    </div>
+    <?php else:?>
+        <div class="modal-body">
+            <h3 class="text-muted text-center blue-text">Vous devez créer une nouvelle session avant d'incrire de nouveaux membres</h3>
+        </div>
+    <?php endif;?>
 
 </div>

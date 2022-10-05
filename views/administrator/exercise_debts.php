@@ -1,5 +1,5 @@
 <?php $this->beginBlock('title') ?>
-    Dettes
+    Fonds Social
 <?php $this->endBlock() ?>
 <?php $this->beginBlock('style') ?>
     <style>
@@ -21,7 +21,7 @@ $refunds = \app\models\Refund::find()->where(['is not','exercise_id',null])->all
 
         <div class="row mb-2">
             <div class="col-12 white-block">
-                <h3 class="text-center text-muted">Fond social</h3>
+                <h3 class="text-center text-muted">Fonds social</h3>
                 <hr>
 
                 <?php
@@ -57,7 +57,7 @@ $refunds = \app\models\Refund::find()->where(['is not','exercise_id',null])->all
                                 <div class="modal-content">
 
                                     <div class="modal-body">
-                                        <p class="text-center p-3">Êtes-vous sûr(e) de vouloir enregistrer le fond social de ce membre?</p>
+                                        <p class="text-center p-3">Êtes-vous sûr(e) de vouloir enregistrer le fonds social de ce membre?</p>
                                         <div class="text-center my-2">
                                             <button class="btn btn-danger" data-dismiss="modal">Non</button>
                                             <a href="<?= Yii::getAlias("@administrator.fix_social_crown")."?q=".$member->id?>"
@@ -75,7 +75,7 @@ $refunds = \app\models\Refund::find()->where(['is not','exercise_id',null])->all
                 <?php
                 else:
                 ?>
-                <p class="text-center blue-text">Aucune dette de règlement de fond social</p>
+                <p class="text-center blue-text">Aucune dette de règlement de fonds social</p>
                 <?php
                 endif;
                 ?>

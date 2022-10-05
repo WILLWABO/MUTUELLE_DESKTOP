@@ -3,7 +3,7 @@ Membres
 <?php $this->endBlock()?>
 <?php $this->beginBlock('style') ?>
 <style>
-    #btn-add {
+    #btn-list{
         position: fixed!important;
         bottom: 25px;
         right: 25px;
@@ -77,3 +77,4 @@ Membres
     </div>
 
 </div>
+<a href="<?= Yii::getAlias("@member.members_list") ?>" class="btn btn-primary" id="btn-list"><i class="fa fa-book fa-fw"></i></a>

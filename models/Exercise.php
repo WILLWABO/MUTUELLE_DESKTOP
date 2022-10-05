@@ -28,6 +28,11 @@ class Exercise extends ActiveRecord
         $sessions = Session::find()->select('id')->where(['exercise_id' => $this->id])->column();
         return Saving::find()->where(['session_id' => $sessions])->sum('amount') ;
     }
+    
+    public function totalTontinedAmount() {
+        $sessions = Session::find()->select('id')->where(['exercise_id' => $this->id])->column();
+        return Tontine::find()->where(['session_id' => $sessions])->sum('amount') ;
+    }
 
     public function totalBorrowedAmount() {
         $sessions = Session::find()->select('id')->where(['exercise_id' => $this->id])->column();

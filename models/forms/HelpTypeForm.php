@@ -7,6 +7,7 @@
  */
 
 namespace app\models\forms;
+use yii\db\ActiveRecord;
 
 
 use yii\base\Model;
@@ -17,6 +18,16 @@ class HelpTypeForm extends Model
     public $title;
     public $amount;
 
+
+    public function attributeLabels()
+    {
+        return [
+            'title' => 'Titre',
+            'amount' => 'Montant',
+
+        ];
+    }
+
     public function rules()
     {
         return [
@@ -25,7 +36,7 @@ class HelpTypeForm extends Model
             ['title','string'],
             ['title','required'],
             ['amount','required'],
-            ['amount','number','min'=> 1,'integerOnly' => true,'message' => 'Ce champ doit être un entier positif'],
+            ['amount','number','min'=> 0,'integerOnly' => true,'message' => 'Ce champ doit être un entier positif'],
         ];
     }
 

@@ -14,7 +14,7 @@ Connexion
                     </a>
                 </div>
                 <div class="card-body" >
-                    <h4 class="card-title">Administrateur</h4>
+                    <h4 class="card-title">Administrateurs</h4>
                     <p class="card-text" style="height: 5rem">Les administrateurs ont le droit d'enregistrer des entrées, et des sorties d'argents.</p>
                     <button data-toggle="modal" data-target="#modalAdministrator" class="btn btn-primary">Connexion</button>
                 </div>
@@ -29,7 +29,7 @@ Connexion
                     </a>
                 </div>
                 <div class="card-body">
-                    <h4 class="card-title">Membre</h4>
+                    <h4 class="card-title">Membres</h4>
                     <p class="card-text" style="height: 5rem">Les membres peuvent voir les informations sur leurs comptes ainsi que les informations générales de la mutuelle.</p>
                     <button data-toggle="modal" data-target="#modalMember" class="btn btn-primary">Connexion</button>
                 </div>

@@ -68,16 +68,23 @@ $user = $member->user();
                     <?= $user->email ?>
                 </div>
                 <div class="col-5">
-                    Fond social
+                    Fonds social
                 </div>
                 <div class="col-7">
-                    <?php if ($member->social_crown):
-                        ?>
-                        <span>Payé (<?= $member->social_crown ?>)</span>
+                    <?php $s = \app\managers\SettingManager::getSocialCrown()?>
+                    <?php if ($member->social_crown == $s):
+                    ?>
+                    <span class="green-text">réglé (<?= $member->social_crown ?>)</span>
+
+                    <?php elseif ($member->social_crown < $s):
+                    ?>
+                    <span class="text-secondary">à payer (<?= $s ?>)</span>
+                    <span class="green-text">reste (<?= $s - $member->social_crown ?>)</span>
+
                     <?php
                     else:
-                        ?>
-                        <span class="text-secondary">Non payé</span>
+                    ?>
+                    <span class="text-secondary">non payé </span>
                     <?php
                     endif;
                     ?>
@@ -88,7 +95,7 @@ $user = $member->user();
                     <?php
                     if ($member->active):
                         ?>
-                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-primary p-2">Désactiver le membre</a>
+                        <a href="<?= Yii::getAlias("@administrator.disable_member")."?q=".$member->id ?>" class="btn btn-danger p-2">Désactiver le membre</a>
                     <?php
                     else:
                         ?>
@@ -108,7 +115,10 @@ $user = $member->user();
                     <a  class="black-link" href="<?= Yii::getAlias("@administrator.member")."?q=".$member->id ?>">Général</a>
                 </h5>
                 <h5 class="col">
-                    <a class="black-link" href="<?= Yii::getAlias("@administrator.saving_member")."?q=".$member->id ?>">Epargnes</a>
+                    <a class="black-link" href="<?= Yii::getAlias("@administrator.saving_member")."?q=".$member->id ?>">Épargnes</a>
+                </h5>
+                <h5 class="col">
+                    <a class="black-link" href="<?= Yii::getAlias("@administrator.tontine_member")."?q=".$member->id ?>">Tontines</a>
                 </h5>
                 <h5 class="col">
                     <a href="<?= Yii::getAlias("@administrator.borrowing_member")."?q=".$member->id ?>">Emprunts</a>
@@ -133,7 +143,7 @@ $user = $member->user();
                             <th>#</th>
                             <th>Montant emprunté</th>
                             <th>Intérêt</th>
-                            <th>Montant total</th>
+                            <th>Montant à rembourser</th>
                             <th>Montant remboursé</th>
                             <th>Montant restant</th>
                             <th>Administrateur</th>
@@ -155,7 +165,7 @@ $user = $member->user();
                             <tr>
                                 <th scope="row"><?= $index + 1 ?></th>
                                 <td class="blue-text"><?= $amount ? $amount : 0 ?> XAF</td>
-                                <td><?= $interest ?> %</td>
+                                <td><?= $interest*3 ?> %</td>
                                 <td><?= $intendedAmount?$intendedAmount:0 ?> XAF</td>
                                 <td><?= $refundedAmount?$refundedAmount:0 ?> XAF</td>
                                 <td class="text-secondary"><?= $rest?$rest:0 ?> XAF</td>

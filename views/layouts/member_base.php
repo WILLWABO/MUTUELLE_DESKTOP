@@ -1,7 +1,7 @@
 <?php
 use app\managers\MemberSessionManager;
 use yii\helpers\Html;
-$this->title = "Mutuelle - ENSP";
+$this->title = "Mutuelle - ENSPY";
 ?>
 
 <?php $this->beginPage() ?>
@@ -28,6 +28,7 @@ $this->title = "Mutuelle - ENSP";
             }
             #btn-disconnect {
                 margin: 0px;
+                padding: 10px;
             }
         </style>
 
@@ -46,7 +47,7 @@ $this->title = "Mutuelle - ENSP";
 
                 <!-- Brand -->
                 <a class="navbar-brand waves-effect" href="<?= Yii::getAlias("@member.home")?>">
-                    <img src="/img/icon.png" alt="ENSP" style="width: 40px; height: 40px;" class="d-md-none">
+                    <img src="/img/icon.png" alt="ENSPY" style="width: 40px; height: 40px;" class="d-md-none">
                 </a>
 
                 <!-- Collapse -->
@@ -64,16 +65,19 @@ $this->title = "Mutuelle - ENSP";
                             <a class="nav-link waves-effect <?= MemberSessionManager::isAccueil()?'blue-text':'' ?>" href="<?= Yii::getAlias("@member.home")?>">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= Yii::getAlias("@member.epargnes") ?>" class="nav-link waves-effect <?= MemberSessionManager::isEpargnes()?'blue-text':''?>" >Mes épargnes</a>
+                            <a href="<?= Yii::getAlias("@member.epargnes") ?>" class="nav-link waves-effect <?= MemberSessionManager::isEpargnes()?'blue-text':''?>" >Épargnes</a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= Yii::getAlias("@member.emprunts") ?>" class="nav-link waves-effect  <?= MemberSessionManager::isEmprunts()?'blue-text':''?>" >Mes emprunts</a>
+                            <a href="<?= Yii::getAlias("@member.emprunts") ?>" class="nav-link waves-effect  <?= MemberSessionManager::isEmprunts()?'blue-text':''?>" >Emprunts</a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= Yii::getAlias("@member.contributions") ?>" class="nav-link waves-effect  <?= MemberSessionManager::isContributions()?'blue-text':''?>" >Mes contributions</a>
+                            <a href="<?= Yii::getAlias("@member.contributions") ?>" class="nav-link waves-effect  <?= MemberSessionManager::isContributions()?'blue-text':''?>" >Contributions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link waves-effect  <?= MemberSessionManager::isSessions()?'blue-text':''?>" href="<?= Yii::getAlias("@member.sessions") ?>">Détails sessions</a>
+                            <a href="<?= Yii::getAlias("@member.tontine_member") ?>" class="nav-link waves-effect  <?= MemberSessionManager::isTontines()?'blue-text':''?>" >Tontines</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link waves-effect  <?= MemberSessionManager::isSessions()?'blue-text':''?>" href="<?= Yii::getAlias("@member.sessions") ?>">Sessions</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link waves-effect  <?= MemberSessionManager::isExercices()?'blue-text':''?>" href="<?= Yii::getAlias("@member.exercises") ?>">Détails exercices</a>
@@ -109,7 +113,7 @@ $this->title = "Mutuelle - ENSP";
         <div class="sidebar-fixed position-fixed">
             <div class="text-center">
                 <a class="logo-wrapper waves-effect" href="<?= Yii::getAlias("@member.home") ?>">
-                    <img src="<?= Yii::getAlias("@web")."/img/icon.png"?>" class="img-fluid" alt="ENSP">
+                    <img src="<?= Yii::getAlias("@web")."/img/icon.png"?>" class="img-fluid" alt="ENSPY">
                 </a>
             </div>
 

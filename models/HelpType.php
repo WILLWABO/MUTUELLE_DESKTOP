@@ -25,7 +25,7 @@ class HelpType extends ActiveRecord
     public function rules()
     {
         return [
-            ['title','unique']
+            ['title','unique','message' => 'Cette aide a déjà été créée']
         ];
     }
 }

@@ -17,7 +17,7 @@ class m181222_180245_create_session_table extends Migration
             'exercise_id' => $this->integer()->unsigned(),
             'date' => $this->dateTime(),
             'administrator_id'=> $this->integer()->unsigned(),
-            'state' => $this->string()->defaultValue("SAVING"),
+            'state' => $this->string()->defaultValue("INSCRIPTION"),
             'active' => $this->boolean()->defaultValue(true),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')
         ]);

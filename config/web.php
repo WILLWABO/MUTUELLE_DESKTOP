@@ -13,6 +13,7 @@ $config = [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@uploadedfilesdir' => '@app/uploadedfiles'
     ],
     'components' => [
         'request' => [
@@ -58,6 +59,7 @@ $config = [
         ],
         'db' => $db,
 
+            // in order to have a best form of an URL
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

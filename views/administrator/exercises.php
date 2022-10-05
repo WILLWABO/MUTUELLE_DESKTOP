@@ -85,7 +85,7 @@ Exercices
                     <div class="col-md-4 p-1">
                         <div class="white-block">
                             <div class="bl b-amount">
-                                <h5>Fond total</h5>
+                                <h5>Fonds total</h5>
                                 <h2><?= ($t=$exercise->exerciseAmount())?$t:0 ?> XAF</h2>
                             </div>
                             
@@ -103,7 +103,7 @@ Exercices
                             </div>
                             <div class="bl b-interest">
                                 <h5>Intérêt produit</h5>
-                                <h2><?= ($t=$exercise->interest())?$t:0 ?> XAF</h2>
+                                <h2><?= ($t=$exercise->interest())? 3*$t:0 ?> XAF</h2>
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,7 @@ Exercices
                             <th>Montant emprunté</th>
                             <th>Dette remboursée</th>
                             <th>Intérêt sur les dettes</th>
-                            <th>Total obtenu</th>
+                            <th>Avoirs</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -147,8 +147,8 @@ Exercices
                                 <td><?= $savedAmount?$savedAmount:0 ?> XAF</td>
                                 <td><?= $borrowedAmount?$borrowedAmount:0 ?> XAF</td>
                                 <td><?= $refundedAmount?$refundedAmount:0 ?> XAF</td>
-                                <td class="blue-text"><?= $interest ?> XAF</td>
-                                <td class="text-capitalize text-secondary"><?= !$exercise->active?$savedAmount+$interest." XAF":"###" ?></td>
+                                <td class="blue-text"><?= round($interest) ?> XAF</td>
+                                <td class="text-capitalize text-secondary"><?= ($savedAmount?$savedAmount:0) + round($interest) ?> XAF</td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>

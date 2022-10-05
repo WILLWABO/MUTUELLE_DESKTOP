@@ -10,6 +10,7 @@ namespace app\models;
 
 
 use app\managers\FinanceManager;
+use app\managers\SettingManager;
 use yii\db\ActiveRecord;
 
 class Member extends ActiveRecord
@@ -52,18 +53,88 @@ class Member extends ActiveRecord
     }
 
     public function interest(Exercise $exercise) {
-        $sessions = Session::find()->select('id')->where(['exercise_id' => $exercise->id])->column();
-        $savings = Saving::find()->select('id')->where(['member_id' => $this->id,'session_id' => $sessions])->column();
-        $borrowingSavings = BorrowingSaving::find()->where(['saving_id' => $savings])->all();
+        $sessions = Session::findAll(['exercise_id' => $exercise->id]);
+        $sum = 0;
+        foreach($sessions as $session){
+            $sum += $this->sessioninterest($session);
+        }
 
+        return $sum;
+    }
+
+    public function sessioninterest(Session $session) {
+        $saving = Saving::find()->where(['<=', 'session_id', $session->id])->sum('amount');
+        $memberSaving = Saving::find()->where(['member_id' => $this->id])->andWhere(['<=', 'session_id', $session->id])->sum('amount');
+        $borrowings = Borrowing::find()->where(['session_id' => $session->id])->all();
+        $borrowings1 = Borrowing::find()->where(['session_id' => $session->id - 1])->all();
+        $borrowings2 = Borrowing::find()->where(['session_id' => $session->id - 2 ])->all();
+    
 
         $sum = 0;
-        foreach($borrowingSavings as $borrowingSaving){
-            $percent = $borrowingSaving->percent;
-            $borrowing = Borrowing::findOne($borrowingSaving->borrowing_id);
-            $sum += ($percent/100.0)* (FinanceManager::intendedAmountFromBorrowing($borrowing)-$borrowing->amount );
+        foreach($borrowings as $borrowing){
+            $percent = $memberSaving / $saving;
+            $sum += $percent*($borrowing->amount*$borrowing->interest);
         }
-        return $sum;
+
+        $sum1 = 0;
+        foreach($borrowings1 as $borrowing1){
+            $percent = $memberSaving / $saving;
+            $sum1 += $percent*($borrowing1->amount*$borrowing1->interest);
+        }
+
+        $sum2 = 0;
+        foreach($borrowings2 as $borrowing2){
+            $percent = $memberSaving / $saving;
+            $sum2 += $percent*($borrowing2->amount*$borrowing2->interest);
+        }
+        return ($sum + $sum1 + $sum2)/100.0;
+    }
+   
+    public function sessionSumInterest($q) {
+        $saving = Saving::find()->where(['<=', 'session_id', $q])->sum('amount');
+        $memberSaving = Saving::find()->where(['member_id' => $this->id])->andWhere(['<=', 'session_id', $q])->sum('amount');
+        $borrowings = Borrowing::find()->where(['session_id' => $q])->all();
+        $borrowings1 = Borrowing::find()->where(['session_id' => $q- 1])->all();
+        $borrowings2 = Borrowing::find()->where(['session_id' => $q- 2 ])->all();
+    
+
+        $sum = 0;
+        foreach($borrowings as $borrowing){
+            $percent = $memberSaving / $saving;
+            $sum += $percent*($borrowing->amount*$borrowing->interest);
+        }
+
+        $sum1 = 0;
+        foreach($borrowings1 as $borrowing1){
+            $percent = $memberSaving / $saving;
+            $sum1 += $percent*($borrowing1->amount*$borrowing1->interest);
+        }
+
+        $sum2 = 0;
+        foreach($borrowings2 as $borrowing2){
+            $percent = $memberSaving / $saving;
+            $sum2 += $percent*($borrowing2->amount*$borrowing2->interest);
+        }
+        return ($sum + $sum1 + $sum2)/100.0;
+    }
+
+    public function sessionfonds(Session $session) {
+        $memberSaving1 = Saving::find()->where(['member_id' => $this->id])->andWhere(['<=', 'session_id', $session->id])->sum('amount');
+        $memberInterest1 = round($this->sessioninterest($session));
+        $memberInterest2 = 0;
+        for($i=1 ; $i<$session->id ; $i++){
+            $memberInterest2 += round($this->sessionSumInterest($i));
+        }
+        return ($memberSaving1 + ($memberInterest1) + ($memberInterest2)) ;
+    }
+
+    public function sessionDettes(Session $session) {
+        $borrowings = Borrowing::find()->where(['member_id'=>$this->id])->andWhere(['>=', 'session_id', $session->id])->all();
+        $refund = Refund:: find()->where(['member_id'=>$this->id])->andWhere(['<=', 'session_id', $session->id])->sum('amount');
+        $interest = SettingManager::getInterest();
+        $borrow = Borrowing::find()->where(['member_id'=>$this->id])->andWhere(['<=', 'session_id', $session->id])->sum('amount');
+        $indentedAmount = $borrow + 3*($borrow * $interest)/100.0;
+        return ($indentedAmount - $refund);
     }
 
     public function administrator() {

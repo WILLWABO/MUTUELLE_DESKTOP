@@ -17,12 +17,13 @@ class NewHelpForm extends Model
     public $limit_date;
     public $comments;
     public $help_type_id;
+    public $session_id;
 
     public function rules()
     {
         return [
-            [['member_id','help_type_id'],'integer','min' => 1,'message' => 'Ce champ attend un entier positif'],
-            [['comments','member_id','help_type_id','limit_date'],'required','message' => 'Ce champ est obligatoire'],
+            [['member_id','help_type_id', 'session_id'],'integer','min' => 1,'message' => 'Ce champ attend un entier positif'],
+            [['comments','member_id','help_type_id','limit_date', 'session_id'],'required','message' => 'Ce champ est obligatoire'],
             [['limit_date'],'datetime','format' => 'yyyy-M-d','message' => 'Ce champ attend une date'],
             ['comments','string','message' => 'Ce champ attend un texte']
         ];

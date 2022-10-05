@@ -25,7 +25,7 @@ class AdministratorSessionManager
         \Yii::$app->session->set(self::place,"profile");
         \Yii::$app->session->set(self::head,null);
     }
-
+    
     public static function setMembers() {
         \Yii::$app->session->set(self::place,"members");
         \Yii::$app->session->set(self::head,null);
@@ -51,6 +51,15 @@ class AdministratorSessionManager
     }
     public static function isHeadSaving() {
         return \Yii::$app->session->get(self::head) == "saving";
+    }
+    public static function isHeadTontine() {
+        return \Yii::$app->session->get(self::head) == "tontine";
+    }
+    public static function isHeadCategorie() {
+        return \Yii::$app->session->get(self::head) == "categorie";
+    }
+    public static function isHeadSocial() {
+        return \Yii::$app->session->get(self::head) == "social";
     }
     public static function isHeadRefund() {
         return \Yii::$app->session->get(self::head) == "refund";

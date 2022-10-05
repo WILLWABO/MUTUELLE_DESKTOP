@@ -14,6 +14,18 @@ Membres
         height: 50px;
         padding: 10px;
     }
+
+    #btn-list {
+        position: fixed!important;
+        bottom: 25px;
+        right: 90px;
+        z-index: 1000;
+        border-radius: 100px;
+        font-size: 1.3rem;
+        width: 50px;
+        height: 50px;
+        padding: 10px;
+    }
 </style>
 <?php $this->endBlock()?>
 
@@ -30,7 +42,7 @@ Membres
 
                 $user = $member->user();
                     ?>
-                    <div class="col-4">
+                    <div class="col-4 mb-4">
                         <div class="card">
                             <!-- Card image -->
                             <div class="view overlay">
@@ -60,7 +72,7 @@ Membres
                                 </p>
                                 <!-- Button -->
                                 <div class="text-right">
-                                    <a href="<?= Yii::getAlias("@administrator.member")."?q=".$member->id ?>" class="btn btn-primary p-2">Details des activités</a>
+                                    <a href="<?= Yii::getAlias("@administrator.member")."?q=".$member->id ?>" class="btn btn-primary p-2">Détails des activités</a>
 
                                 </div>
 
@@ -82,3 +94,4 @@ Membres
 
 </div>
 <a href="<?= Yii::getAlias("@administrator.new_member") ?>" class="btn btn-primary" id="btn-add"><i class="fas fa-plus"></i></a>
+<a href="<?= Yii::getAlias("@administrator.members_list") ?>" class="btn btn-primary" id="btn-list"><i class="fa fa-book fa-fw"></i></a>

@@ -7,39 +7,53 @@
 <?php $this->endBlock() ?>
 
 <div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-12 mb-3">
-            <h3  class="text-center text-muted">Nouvelle contribution</h3>
+<?php $activeSession = \app\models\Session::findOne(['active' => true]); ?>
+    <?php if(is_object($activeSession )): ?>
+        <?php if($activeSession->state=="REFLOATING"): ?>
+            <div class="row justify-content-center">
+                <div class="col-12 mb-3">
+                    <h3  class="text-center text-muted">Nouvelle contribution</h3>
+                </div>
+                <?php
+                $form = \yii\widgets\ActiveForm::begin([
+                    'errorCssClass' => 'text-secondary',
+                    'options' => ['class' => 'col-md-8 col-12 white-block'],
+                    'action' => '@administrator.add_contribution',
+                    'method' => 'post'
+                ]);
+
+                $members = \app\models\Contribution::find()->where(['help_id' =>$model->help_id,'state' => false])->select('member_id')->column();
+
+                $members = \app\models\Member::findAll(['id' => $members]);
+
+                $items = [];
+
+                foreach ($members as $member) {
+                    $user = $member->user();
+                    $items[$member->id] = $user->name." ".$user->first_name;
+                }
+                ?>
+
+                <?= $form->field($model,'help_id')->hiddenInput()->label(false) ?>
+                <?= $form->field($model,'member_id')->dropDownList($items,['required'=> 'required'])->label("Contributeur")?>
+                <?= $form->field($model,"date")->input("date",['required'=> 'required'])->label("Date de contribution");?>
+                <?= $form->field($model, 'session_id')->hiddenInput(['value' => $activeSession->id])->label(false) ?>
+
+                <div class="form-group text-right">
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                </div>
+                <?php
+                \yii\widgets\ActiveForm::end()
+                ?>
+            </div>
+        <?php else:?>
+            <div class="modal-body">
+                <h3 class="text-muted text-center blue-text">Veuillez attendre la phase de renflouement.</h3>
+            </div>
+        <?php endif;?>
+    <?php else:?>
+        <div class="modal-body">
+            <h3 class="text-muted text-center blue-text">Vous devez créer une nouvelle session avant de régler les contributions des membres.</h3>
         </div>
-        <?php
-        $form = \yii\widgets\ActiveForm::begin([
-            'errorCssClass' => 'text-secondary',
-            'options' => ['class' => 'col-md-8 col-12 white-block'],
-            'action' => '@administrator.add_contribution',
-            'method' => 'post'
-        ]);
-
-        $members = \app\models\Contribution::find()->where(['help_id' =>$model->help_id,'state' => false])->select('member_id')->column();
-
-        $members = \app\models\Member::findAll(['id' => $members]);
-
-        $items = [];
-
-        foreach ($members as $member) {
-            $user = $member->user();
-            $items[$member->id] = $user->name." ".$user->first_name;
-        }
-        ?>
-
-        <?= $form->field($model,'help_id')->hiddenInput()->label(false) ?>
-        <?= $form->field($model,'member_id')->dropDownList($items,['required'=> 'required'])->label("Contributeur")?>
-        <?= $form->field($model,"date")->input("date",['required'=> 'required'])->label("Date de contribution");?>
-
-        <div class="form-group text-right">
-            <button class="btn btn-primary" type="submit">Enregistrer</button>
-        </div>
-        <?php
-        \yii\widgets\ActiveForm::end()
-        ?>
-    </div>
+    <?php endif;?>
 </div>

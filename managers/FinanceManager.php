@@ -15,6 +15,7 @@ use app\models\Help;
 use app\models\Member;
 use app\models\Refund;
 use app\models\Saving;
+use app\models\Tontine;
 use app\models\Session;
 use app\models\User;
 
@@ -34,6 +35,15 @@ class FinanceManager
         if ($exercise) {
             $sessions = Session::find()->select('id')->where(['exercise_id' => $exercise->id])->column();
             return Saving::find()->where(['session_id' => $sessions])->sum('amount') ;
+        }
+        return 0;
+    }
+
+    public static function totalTontinedAmount() {
+        $exercise = Exercise::findOne(['active' => true]);
+        if ($exercise) {
+            $sessions = Session::find()->select('id')->where(['exercise_id' => $exercise->id])->column();
+            return Tontine::find()->where(['session_id' => $sessions])->sum('amount') ;
         }
         return 0;
     }
@@ -99,7 +109,7 @@ class FinanceManager
     }
 
     public static function intendedAmountFromBorrowing(Borrowing $borrowing) {
-        return $borrowing->amount + ($borrowing->amount*$borrowing->interest)/100.0;
+        return $borrowing->amount + 3*($borrowing->amount*$borrowing->interest)/100.0;
     }
 
     public static function notRefundedBorrowings() {

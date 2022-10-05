@@ -17,6 +17,15 @@ class SettingForm extends Model
     public $social_crown;
     public $inscription;
 
+    public function attributeLabels()
+    {
+        return [
+            'interest' => 'intérêt',
+            'social_crown' => 'fond Social',
+
+        ];
+    }
+
 
     public function rules()
     {

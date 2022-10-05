@@ -26,9 +26,9 @@ class NewAdministratorForm extends Model
     {
         return [
             [['username','name','first_name','tel','password','email','address'],'string','message' => 'Ce champ doit être du texte'],
-            [['username','name','first_name','tel','password','email','address'],'required','message' => 'Ce champ est obligatoire'],
+            [['username','name','first_name','tel','password','email'],'required','message' => 'Ce champ est obligatoire'],
             [['email'],'email','message' => 'Ce champ doit être un email'],
-            [['avatar'],'image','message' => 'Ce champ attend une image'],
+            [['avatar'],'image','message' => 'Ce champ attend une image','extensions'=>'jpg,jpeg,png,gif,jfif'],
         ];
     }
 }

@@ -18,6 +18,7 @@ use app\managers\SettingManager;
 use app\models\Administrator;
 use app\models\Borrowing;
 use app\models\BorrowingSaving;
+use app\models\Categorie;
 use app\models\Contribution;
 use app\models\Exercise;
 use app\models\forms\HelpTypeForm;
@@ -29,8 +30,12 @@ use app\models\forms\NewHelpForm;
 use app\models\forms\NewMemberForm;
 use app\models\forms\NewRefundForm;
 use app\models\forms\NewSavingForm;
+use app\models\forms\NewTontineForm;
+use app\models\forms\NewCategorieForm;
+use app\models\forms\NewSocialForm;
 use app\models\forms\NewSessionForm;
 use app\models\forms\SettingForm;
+use app\models\forms\UpdateAvatar;
 use app\models\forms\UpdatePasswordForm;
 use app\models\forms\UpdateSocialInformationForm;
 use app\models\Help;
@@ -38,9 +43,12 @@ use app\models\HelpType;
 use app\models\Member;
 use app\models\Refund;
 use app\models\Saving;
+use app\models\Tontine;
 use app\models\Session;
+use app\models\Social;
 use app\models\User;
 use DateTime;
+use Exception;
 use Yii;
 use yii\base\Security;
 use yii\data\Pagination;
@@ -141,17 +149,15 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
     }
 
-
-
     public function actionProfil() {
         AdministratorSessionManager::setProfile();
         return $this->render('profile');
     }
+
     public function actionModifierProfil() {
         AdministratorSessionManager::setProfile();
 
         $socialModel = new UpdateSocialInformationForm();
-        $passwordModel = new UpdatePasswordForm();
 
         $socialModel->attributes = [
             'username' => $this->administrator->username,
@@ -162,20 +168,24 @@ class AdministratorController extends Controller
             'address' => $this->user->address,
         ];
 
-        return $this->render('update_profile',compact('socialModel','passwordModel'));
+        return $this->render('update_profile',compact('socialModel'));
+    }
+
+    public function actionModifierPassword() {
+        AdministratorSessionManager::setProfile();
+        $passwordModel = new UpdatePasswordForm();
+        return $this->render('modifier_password',compact('passwordModel'));
     }
 
     public function actionModifierInformationSociale() {
         if (\Yii::$app->request->getIsPost()) {
             $socialModel = new UpdateSocialInformationForm();
-            $passwordModel = new UpdatePasswordForm();
-
             if ($socialModel->load(\Yii::$app->request->post()) &&  $socialModel->validate()) {
                 $administrator = Administrator::findOne(['username' => $socialModel->username]);
                 if ($administrator && $administrator->id!= $this->administrator->id) {
 
                     $socialModel->addError("username","Ce nom d'utilisateur est déjà utilisé");
-                    return $this->render('update_profile',compact('socialModel','passwordModel'));
+                    return $this->render('update_profile',compact('socialModel'));
                 }
                 else {
                     $this->user->name = $socialModel->name;
@@ -183,8 +193,17 @@ class AdministratorController extends Controller
                     $this->user->tel = $socialModel->tel;
                     $this->user->email = $socialModel->email;
                     $this->user->address = $socialModel->address;
-                    if (UploadedFile::getInstance($socialModel,"avatar"))
-                        $this->user->avatar = FileManager::storeAvatar( UploadedFile::getInstance($socialModel,"avatar"),$socialModel->username,"ADMINISTRATOR");
+                   /*if (UploadedFile::getInstance($socialModel,'avatar')){
+                        $this->user->avatar = FileManager::storeAvatar( UploadedFile::getInstance($socialModel,'avatar'),$socialModel->username,"ADMINISTRATOR");
+                   }*/
+                    if (UploadedFile::getInstance($socialModel,'avatar')){
+                        $this->user->avatar=UploadedFile::getInstance($socialModel,'avatar');
+                        $this->user->avatar->saveAs('img/upload/'.$this->user->avatar->basename.'.'.$this->user->avatar->extension);
+                        $socialModel->avatar=$this->user->avatar->basename.'.'.$this->user->avatar->extension;
+                    }
+                    else{
+                        $this->user->avatar=null;
+                    }
                     $this->user->save();
                     $this->administrator->username = $socialModel->username;
                     $this->administrator->save();
@@ -192,7 +211,7 @@ class AdministratorController extends Controller
                 }
             }
             else
-                return $this->render('update_profile',compact('socialModel','passwordModel'));
+                return $this->render('update_profile',compact(''));
 
         }
         else
@@ -203,15 +222,6 @@ class AdministratorController extends Controller
 
     public function actionModifierMotDePasse() {
         if (\Yii::$app->request->getIsPost()) {
-            $socialModel = new UpdateSocialInformationForm();
-            $socialModel->attributes = [
-                'username' => $this->administrator->username,
-                'name' => $this->user->name,
-                'first_name' => $this->user->first_name,
-                'tel' => $this->user->tel,
-                'email' => $this->user->email,
-            ];
-
             $passwordModel = new UpdatePasswordForm();
             if ($passwordModel->load(\Yii::$app->request->post()) &&  $passwordModel->validate()) {
                 if ($this->user->validatePassword($passwordModel->password)) {
@@ -221,12 +231,12 @@ class AdministratorController extends Controller
                 }
                 else {
                     $passwordModel->addError('password','Le mot de passe ne correspond pas.');
-                    return $this->render('update_profile',compact('socialModel','passwordModel'));
+                    return $this->render('modifier_password',compact('passwordModel'));
                 }
 
             }
             else
-                return $this->render('update_profile',compact('socialModel','passwordModel'));
+                return $this->render('modifier_password',compact('passwordModel'));
 
         }
         else
@@ -268,7 +278,7 @@ class AdministratorController extends Controller
                 $helpType->title = $model->title;
                 $helpType->amount = $model->amount;
                 $helpType->save();
-                return $this->redirect("@administrator.help_types");
+                return $this->render('update_help_type',compact('model'));
             }
             else{
                 return $this->render('update_help_type',compact('model'));
@@ -287,7 +297,10 @@ class AdministratorController extends Controller
                 if ($helpType)
                 {
                     $helpType->active = false;
-                    $helpType->save();
+                    try {
+                    $helpType->delete();
+                    } catch (\Exception $e){}
+
                     return $this->redirect("@administrator.help_types");
                 }
                 else
@@ -309,11 +322,18 @@ class AdministratorController extends Controller
         if (\Yii::$app->request->getIsPost()) {
             $model = new HelpTypeForm();
 
-            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $newModel = new HelpType();
+
+            if ($model->load(Yii::$app->request->post()) && $newModel->validate()) {
                 $helpType = new HelpType();
                 $helpType->title = $model->title;
                 $helpType->amount=  $model->amount;
                 $helpType->save();
+                if ($helpType->save()) {
+                    Yii::$app->session->setFlash('success', "Type d'aide créé avec succès"); 
+                } else {
+                    Yii::$app->session->setFlash('error', "Ce type d'aide existe déjà");
+                }
                 return $this->redirect('@administrator.help_types');
             }
             else
@@ -341,6 +361,12 @@ class AdministratorController extends Controller
         AdministratorSessionManager::setMembers();
         $members = Member::find()->all();
         return $this->render('members',compact('members'));
+    }
+
+    public function actionListeMembres() {
+        AdministratorSessionManager::setMembers();
+        $members = Member::find()->all();
+        return $this->render('members_list',compact('members'));
     }
 
     public function actionNouveauMembre() {
@@ -371,10 +397,19 @@ class AdministratorController extends Controller
                     $user->address = $model->address;
                     $user->type = "ADMINISTRATOR";
                     $user->password = (new Security())->generatePasswordHash($model->password);
-                    if (UploadedFile::getInstance($model,'avatar'))
+                   /* if (UploadedFile::getInstance($model,'avatar'))
                         $user->avatar = FileManager::storeAvatar(UploadedFile::getInstance($model,'avatar'),$model->username,'MEMBER');
                     else
-                        $user->avatar = null;
+                        $user->avatar = null;*/
+                        if (UploadedFile::getInstance($model,'avatar'))
+                        {
+                            $user->avatar=UploadedFile::getInstance($model,'avatar');
+                            $user->avatar->saveAs('img/upload/'.$user->avatar->basename.'.'.$user->avatar->extension);
+                            $model->avatar=$user->avatar->basename.'.'.$user->avatar->extension;
+                        }
+                        else{
+                            $user->avatar=null;
+                        }
                     $user->save();
 
                     $administrator = new Administrator();
@@ -413,21 +448,49 @@ class AdministratorController extends Controller
                     $user->address = $model->address;
                     $user->type = "MEMBER";
                     $user->password = (new Security())->generatePasswordHash($model->password);
-                    if (UploadedFile::getInstance($model,'avatar'))
+                   /* if (UploadedFile::getInstance($model,'avatar'))
                         $user->avatar = FileManager::storeAvatar(UploadedFile::getInstance($model,'avatar'),$model->username,'MEMBER');
                     else
-                        $user->avatar = null;
+                        $user->avatar = null;*/
+                        
+                    if (UploadedFile::getInstance($model,'avatar'))
+                    {
+                        $user->avatar=UploadedFile::getInstance($model,'avatar');
+                        $user->avatar->saveAs('img/upload/'.$user->avatar->basename.'.'.$user->avatar->extension);
+                        $model->avatar=$user->avatar->basename.'.'.$user->avatar->extension;
+                    }
+                    else{
+                        $user->avatar=null;
+                    }
+                             
                     $user->save();
-
-
+                    
                     $member = new Member();
                     $member->administrator_id = $this->administrator->id;
+                    $member->session_id = $model->session_id;
                     $member->user_id = $user->id;
                     $member->username = $model->username;
                     $member->inscription = SettingManager::getInscription();
                     $member->save();
 
+                    
                     MailManager::alert_new_member($user,$member);
+                    
+
+                
+
+                   /*try{
+                        Yii::$app->mailer->compose()
+                        ->setTo($user->email)
+                        ->setFrom('jasonmfououoyono@gmail.com')
+                        ->setSubject('Confirmation de création de compte de membre')
+                        ->setTextBody("Bienvenue à la mutuelle des enseignants de l'école nationale supérieure polytechnique de Yaoundé")
+                        ->send();
+                    }catch(Swift_TransportException $e)*/
+                   /* {
+                        return $this->redirect('@administrator.members');
+                    }*/
+
                     return $this->redirect('@administrator.members');
                 }
                 $model->addError('username','Ce nom d\'utilisateur est déjà pris');
@@ -467,6 +530,66 @@ class AdministratorController extends Controller
 
 
         return $this->render("savings",compact("model","sessions","pagination"));
+    }
+
+    public function actionTontines() {
+        AdministratorSessionManager::setHome("tontine");
+        $model = new NewTontineForm();
+
+        $query = Session::find();
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $query->count(),
+        ]);
+
+        $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+
+
+        return $this->render("tontines",compact("model","sessions","pagination"));
+    }
+
+    public function actionCategories() {
+        AdministratorSessionManager::setHome("categorie");
+        $model = new NewCategorieForm();
+
+        $query = Session::find();
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $query->count(),
+        ]);
+
+        $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+
+
+        return $this->render("categories",compact("model","sessions","pagination"));
+    }
+
+    public function actionSocial() {
+        AdministratorSessionManager::setHome("social");
+        $model = new NewSocialForm();
+
+        $query = Session::find();
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $query->count(),
+        ]);
+
+        $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+
+
+        return $this->render("social",compact("model","sessions","pagination"));
     }
 
 
@@ -515,6 +638,97 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
     }
 
+    public function actionNouvelleTontine() {
+        if (Yii::$app->request->getIsPost()) {
+
+            $query = Session::find();
+            $pagination = new Pagination([
+                'defaultPageSize' => 5,
+                'totalCount' => $query->count(),
+            ]);
+
+            $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+                ->offset($pagination->offset)
+                ->limit($pagination->limit)
+                ->all();
+
+            $model = new NewTontineForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate() ) {
+                $member = Member::findOne($model->member_id);
+                $session = Session::findOne($model->session_id);
+                $categorie = Categorie::findOne($model->categorie_id);
+                if ($member && $session && ($session->state =="TONTINE")) {
+                    $tontine = new Tontine();
+                    if(is_object($categorie)){
+                        $tonti = Tontine::findOne(['session_id' => $session->id,'member_id' => $member->id, 'categorie_id'=>$categorie->id]);
+                        if($tonti){
+                            $tonti->amount += $model->amount;
+                            $tonti->save();
+                        }
+                        else{
+
+                            $tontine->member_id = $model->member_id;
+                            $tontine->session_id = $model->session_id;
+                            $tontine->amount = $model->amount;
+                            $tontine->categorie_id = $model->categorie_id;
+                            $tontine->administrator_id = $this->administrator->id;
+                            $tontine->save();
+                        }
+                    }
+                    else{
+                        echo "Bien vouloir choisir une catégorie";
+                    }
+                    return $this->redirect("@administrator.tontines");
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else return $this->render("tontines",compact("model","pagination","sessions"));
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
+    public function actionNouvelleCategorie() {
+        if (Yii::$app->request->getIsPost()) {
+
+            $query = Session::find();
+            $pagination = new Pagination([
+                'defaultPageSize' => 5,
+                'totalCount' => $query->count(),
+            ]);
+
+            $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+                ->offset($pagination->offset)
+                ->limit($pagination->limit)
+                ->all();
+
+            $model = new NewCategorieForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate() ) {
+                $member = Member::findOne($model->member_id);
+                $session = Session::findOne($model->session_id);
+                if ($member && $session && ($session->state =="TONTINE")) {
+                    $categorie = new Categorie();
+
+                   
+                        $categorie->member_id = $model->member_id;
+                        $categorie->session_id = $model->session_id;
+                        $categorie->amount = $model->amount;
+                        $categorie->administrator_id = $this->administrator->id;
+                        $categorie->save();
+                    
+
+                    return $this->redirect("@administrator.categories");
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else return $this->render("categories",compact("model","pagination","sessions"));
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
     public function actionRemboursements() {
         AdministratorSessionManager::setHome("refund");
 
@@ -558,13 +772,14 @@ class AdministratorController extends Controller
                     $refundedAmount = FinanceManager::borrowingRefundedAmount($borrowing);
 
                     $intendedAmount = FinanceManager::intendedAmountFromBorrowing($borrowing);
-                    $q = floor($intendedAmount) + 1;
+                    $q = floor($intendedAmount) ;
 
-                    if ( $model->amount+$refundedAmount <  $intendedAmount){
+                    if ( $model->amount+$refundedAmount < $intendedAmount){
                         $refund = new Refund();
                         $refund->borrowing_id = $borrowing->id;
                         $refund->session_id = $model->session_id;
                         $refund->amount = $model->amount;
+                        $refund->member_id = $model->member_id;
                         $refund->administrator_id = $this->administrator->id;
                         $refund->save();
 
@@ -576,6 +791,7 @@ class AdministratorController extends Controller
                         $refund->borrowing_id = $borrowing->id;
                         $refund->session_id = $model->session_id;
                         $refund->amount = $intendedAmount - $refundedAmount;
+                        $refund->member_id = $model->member_id;
                         $refund->administrator_id = $this->administrator->id;
                         $refund->save();
 
@@ -640,7 +856,7 @@ class AdministratorController extends Controller
                     if (! Borrowing::findOne(['member_id' => $member->id,'state' => true]) ) {
                         $exercise = Exercise::findOne(['active' => 1]);
                         $sessionss = Session::find()->select('id')->where(['exercise_id' => $exercise->id])->column();
-                        if ($model->amount <= $this->savingofmember($member,$sessionss)) {
+                        if ($model->amount <= 5*($this->savingofmember($member,$sessionss))) {
                             $borrowing = new Borrowing();
 
                             $borrowing->interest = SettingManager::getInterest();
@@ -664,7 +880,7 @@ class AdministratorController extends Controller
                         }
                         else
                         {
-                            $model->addError('amount','Le montant demandé est supérieur au montant total des épargnes de ce membre : '. $this->savingofmember($member,$sessionss).' XAF');
+                            $model->addError('amount','Le montant demandé doit être inférieur à : '. 5*($this->savingofmember($member,$sessionss)).' XAF');
                             return $this->render("borrowings",compact("model","sessions","pagination"));
                         }
 
@@ -684,9 +900,6 @@ class AdministratorController extends Controller
         else
             return RedirectionManager::abort($this);
     }
-
-
-
 
     public function actionSessions() {
         AdministratorSessionManager::setHome("session");
@@ -755,11 +968,75 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
     }
 
+    public function actionPasserAuxEpargnes($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $session->state = "SAVING";
+                $session->save();
+
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
+    public function actionPasserAuxTontines($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $session->state = "TONTINE";
+                $session->save();
+
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
     public function actionPasserAuxEmprunts($q=0) {
         if ($q) {
             $session = Session::findOne($q);
             if ($session && $session->active) {
                 $session->state = "BORROWING";
+                $session->save();
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionPasserAuxFondsSociaux($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $session->state = "SOCIALCROWN";
+                $session->save();
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionPasserAuxRenflouements($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $session->state = "REFLOATING";
                 $session->save();
                 return $this->redirect("@administrator.home");
             }
@@ -779,11 +1056,10 @@ class AdministratorController extends Controller
                 $session->active = false;
                 $session->save();
 
-                Yii::$app->db->createCommand('UPDATE borrowing SET interest=interest+:val WHERE session_id!=:session_id AND state=1 ', [
-                    ':val' => SettingManager::getInterest(),
-                    ':session_id' => $session->id,
-                ])->execute();
-
+                // Yii::$app->db->createCommand('UPDATE borrowing SET interest=interest+:val WHERE session_id!=:session_id AND state=1 ', [
+                //     ':val' => SettingManager::getInterest(),
+                //     ':session_id' => $session->id,
+                // ])->execute();
 
                 foreach (Member::find()->all() as $member) {
                     MailManager::alert_end_session($member->user(),$member,$session);
@@ -817,6 +1093,7 @@ class AdministratorController extends Controller
                             $refund->session_id = $session->id;
                             $refund->administrator_id = $this->administrator->id;
                             $refund->amount = $intendedAmount-$refundedAmount;
+                            $refund->member_id = $borrowing->member_id;
                             $refund->exercise_id = $exercise->id;
                             $refund->save();
 
@@ -872,6 +1149,31 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
 
     }
+    public function actionRentrerAuxEmprunts($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $tontines = Tontine::findAll(['session_id' => $session->id]);
+                $categories = Categorie::findAll(['session_id' => $session->id]);
+                foreach ($tontines as $tontine) {
+                    $tontine->delete();
+                }
+                foreach ($categories as $categorie) {
+                    $categorie->delete();
+                }
+
+                $session->state = "BORROWING";
+                $session->save();
+
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
 
     public function actionRentrerAuxEpargnes($q=0) {
         if ($q) {
@@ -886,6 +1188,75 @@ class AdministratorController extends Controller
                 }
 
                 $session->state = "SAVING";
+                $session->save();
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionRentrerAuxInscriptions($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $contributions = Contribution::find()->where(['session_id'=>$session->id])->all();
+                foreach ($contributions as $contribution) {
+                        $helps = Help::findOne(['id'=>$contribution->help_id]);
+                        $helps->state = true;
+                        $contribution->state = false;
+                        $helps->save();
+                        $contribution->save();
+                    }
+                $session->state = "INSCRIPTION";
+                $session->save();
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionRentrerAuFondSocial($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $savings = Saving::findAll(['session_id' => $q]);
+                foreach ($savings as $saving) {
+                    $saving->delete();
+                }
+
+                $session->state = "SOCIALCROWN";
+                $session->save();
+                return $this->redirect("@administrator.home");
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionRentrerAuxRenflouements($q=0) {
+        if ($q) {
+            $session = Session::findOne($q);
+            if ($session && $session->active) {
+                $sociaux = Social::findAll(['session_id' => $q]);
+                foreach ($sociaux as $social) {
+                    $member = Member::findOne(['session_id' => $q, 'id'=>$social->member_id]);
+                    $member->social_crown = $member->social_crown - $social->amount;
+                    $member->save();
+                    $social->delete();
+                }
+
+                $session->state = "REFLOATING";
                 $session->save();
                 return $this->redirect("@administrator.home");
             }
@@ -933,7 +1304,7 @@ class AdministratorController extends Controller
             {
                 $query = Exercise::find();
                 $pagination = new Pagination([
-                    'defaultPageSize' => 1,
+                    'defaultPageSize' => 5,
                     'totalCount' => $query->count(),
                 ]);
 
@@ -951,6 +1322,31 @@ class AdministratorController extends Controller
         }
     }
 
+    public function actionTontineMembre($q = 0) {
+        if ($q) {
+            $member = Member::findOne($q);
+            if ($member)
+            {
+                $query = Exercise::find();
+                $pagination = new Pagination([
+                    'defaultPageSize' => 5,
+                    'totalCount' => $query->count(),
+                ]);
+
+                $exercises = $query->orderBy(['created_at'=> SORT_DESC])
+                    ->offset($pagination->offset)
+                    ->limit($pagination->limit)
+                    ->all();
+                return $this->render("tontine_member",compact("member","exercises","pagination"));
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else {
+            return RedirectionManager::abort($this);
+        }
+    }
+
     public function actionEmpruntMembre($q = 0) {
         if ($q) {
             $member = Member::findOne($q);
@@ -958,7 +1354,7 @@ class AdministratorController extends Controller
             {
                 $query = Exercise::find();
                 $pagination = new Pagination([
-                    'defaultPageSize' => 1,
+                    'defaultPageSize' => 5,
                     'totalCount' => $query->count(),
                 ]);
 
@@ -1014,10 +1410,11 @@ class AdministratorController extends Controller
                         $help->help_type_id = $model->help_type_id;
                         $help->member_id = $model->member_id;
                         $help->comments = $model->comments;
+                        $help->session_id = $model->session_id;
                         $help->state = true;
                         $help->administrator_id = $this->administrator->id;
 
-                        $members = Member::find()->where(['!=','id',$model->member_id])->andWhere(['active' => true])->all();
+                        $members = Member::find()->where(['active' => true])->all();
 
                         $unit_amount = (int)ceil((double)($help_type->amount)/count($members));
                         $amount = $unit_amount*count($members);
@@ -1031,6 +1428,7 @@ class AdministratorController extends Controller
                             $contribution->state = false;
                             $contribution->member_id  = $member->id;
                             $contribution->help_id = $help->id;
+                            $contribution->session_id = $help->session_id;
                             $contribution->save();
                             MailManager::alert_new_help($member->user(),$member,$help,$help_type);
                         }
@@ -1065,7 +1463,8 @@ class AdministratorController extends Controller
         else
             return RedirectionManager::abort($this);
     }
-
+    
+    // $q is the id of a hepl
     public function actionNouvelleContribution($q=0) {
         if ($q) {
             $help = Help::findOne($q);
@@ -1092,6 +1491,7 @@ class AdministratorController extends Controller
                     if ($contribution && !$contribution->state) {
                         $contribution->state = true;
                         $contribution->date = $model->date;
+                        $contribution->session_id = $model->session_id;
                         $contribution->administrator_id = $this->administrator->id;
                         $contribution->save();
 
@@ -1120,7 +1520,7 @@ class AdministratorController extends Controller
     public function actionAides() {
         AdministratorSessionManager::setHome("help");
 
-        $activeHelps = Help::findAll(['state' => true]);
+        $activeHelps = Help::find()->where(['state' => true])->orderBy('created_at',SORT_DESC)->all();
 
         $query = Help::find()->where(['state' => false])->orderBy('created_at',SORT_DESC);
 
@@ -1154,6 +1554,21 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
     }
 
+    public function actionSupprimerMembre($q=0) {
+        $member = Member::findOne($q);
+        if($member){
+            $user = User::findOne(['id'=>$member->user_id]); 
+            $member->active = false;
+            try {
+            $member->delete();
+            $user->delete();
+            } catch (\Exception $e) {}
+               
+            return $this->redirect("@administrator.members");
+
+        }
+    }
+
     public function actionActiverMembre($q = 0) {
         if ($q) {
             $member = Member::findOne($q);
@@ -1177,6 +1592,92 @@ class AdministratorController extends Controller
                 if ($session && $session->active && $session->state == "SAVING") {
                     $saving->delete();
                     return $this->redirect("@administrator.savings");
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
+    public function actionSupprimerAide($q=0) {
+        if($q){
+            $help = Help::findOne($q);
+            if($help){
+                $contributions = Contribution::findAll(['help_id'=>$help->id]);
+                foreach ($contributions as $contribution):
+                    $contribution->delete();
+                endforeach;
+                $help->delete();
+                return $this->redirect("@administrator.helps");       
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }                   
+
+    public function actionSupprimerContribution($q=0) {
+        if ($q) {
+            $contribution = Contribution::findOne($q);
+            if($contribution){
+                $session = Session::findOne(['active'=>true, 'id'=>$contribution->session_id]);
+                if ($session) {
+                            $helps = Help::findOne(['id'=>$contribution->help_id]);
+                            $helps->state = true;
+                            $contribution->state = false;
+                            $contribution->administrator_id = null;
+                            $helps->save();
+                            $contribution->save();                
+                            return $this->redirect(["@administrator.help_details",'q' =>$helps->id]);
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+
+    }
+
+    public function actionSupprimerTontine($q=0) {
+        if ($q)
+        {
+            $tontine = Tontine::findOne($q);
+            if ($tontine) {
+                $session = $tontine->session();
+                if ($session && $session->active && $session->state == "TONTINE") {
+                    $tontine->delete();
+                    return $this->redirect("@administrator.tontines");
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+    
+    public function actionSupprimerFondSocial($q=0) {
+        if ($q)
+        {
+            $social = Social::findOne($q);
+            if ($social) {
+                $session = $social->session();
+                $member = Member::findOne(['id'=>$social->member_id]);
+                if ($session && $session->active && $session->state == "SOCIALCROWN") {
+                    $member->social_crown-= $social->amount;
+                    $member->save();
+                    $social->delete();
+                    return $this->redirect("@administrator.social");
                 }
                 else
                     return RedirectionManager::abort($this);
@@ -1236,6 +1737,29 @@ class AdministratorController extends Controller
             return RedirectionManager::abort($this);
     }
 
+    public function actionSupprimerCategorie($q=0) {
+        if ($q) {
+            $categorie = Categorie::findOne($q);
+            if ($categorie) {
+                $session = $categorie->session();
+                if ($session && $session->state == "TONTINE" && $session->active) {
+                    try {
+                        $categorie->delete();
+                    } catch(\Exception $e){ die("Error");}
+
+                    return $this->redirect("@administrator.categories");
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+
+            else
+                return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
     public function actionReglerFondSocial($q = 0) {
         if ($q) {
             $member = Member::findOne($q);
@@ -1246,6 +1770,61 @@ class AdministratorController extends Controller
             }
             else
                 return RedirectionManager::abort($this);
+        }
+        else
+            return RedirectionManager::abort($this);
+    }
+
+    
+    public function actionNouveauFondSocial() {
+        if (Yii::$app->request->getIsPost()) {
+
+            $query = Session::find();
+            $pagination = new Pagination([
+                'defaultPageSize' => 5,
+                'totalCount' => $query->count(),
+            ]);
+
+            $sessions = $query->orderBy(['created_at'=> SORT_DESC])
+                ->offset($pagination->offset)
+                ->limit($pagination->limit)
+                ->all();
+
+            $model = new NewSocialForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate() ) {
+                $s = SettingManager::getSocialCrown();
+                $member = Member::findOne($model->member_id);
+                $session = Session::findOne($model->session_id);
+                if ($member && $session && ($session->state =="SOCIALCROWN")) {
+                    if($model->amount + $member->social_crown <= $s){
+                        $social = new Social();
+                        $soc = Social::findOne(['session_id' => $session->id,'member_id' => $member->id]);
+                        if($soc){
+                        $soc->amount += $model->amount;
+                        $member->social_crown += $model->amount;
+                        $member->save();
+                        $soc->save();
+                        }
+                        else{
+                            $social->member_id = $model->member_id;
+                            $social->session_id = $model->session_id;
+                            $social->amount += $model->amount;
+                            $member->social_crown += $model->amount;
+                            $social->administrator_id = $this->administrator->id;
+                            $member->save();
+                            $social->save();
+                        }
+                        return $this->redirect("@administrator.social");
+                    }
+                    else{
+                        $model->addError('amount','Le montant restant à payer est de :'.($s-$member->social_crown));
+                        return $this->render("social",compact("model","pagination","sessions"));
+                    }
+                }
+                else
+                    return RedirectionManager::abort($this);
+            }
+            else return $this->render("social",compact("model","pagination","sessions"));
         }
         else
             return RedirectionManager::abort($this);
@@ -1278,6 +1857,15 @@ class AdministratorController extends Controller
 
     public static function savingofmember($member,$sessionss) {
         $r = Saving::find()->where(['session_id' => $sessionss,'member_id' => $member->id])->sum('amount');
+        if($r):
+            return  $r;
+        else:
+            return 0;
+        endif;
+    }
+
+    public static function tontineofmember($member,$sessionss) {
+        $r = Tontine::find()->where(['session_id' => $sessionss,'member_id' => $member->id])->sum('amount');
         if($r):
             return  $r;
         else:

@@ -71,16 +71,23 @@ $user = $member->user();
                     <?= $user->address ?>
                 </div>
                 <div class="col-5">
-                    Fond social
+                    Fonds social
                 </div>
                 <div class="col-7">
-                    <?php if ($member->social_crown):
+                    <?php $s = \app\managers\SettingManager::getSocialCrown()?>
+                    <?php if ($member->social_crown == $s):
                     ?>
-                    <span>Payé (<?= $member->social_crown ?>)</span>
+                    <span class="green-text">réglé (<?= $member->social_crown ?>)</span>
+
+                    <?php elseif ($member->social_crown < $s):
+                    ?>
+                    <span class="text-secondary">à payer (<?= $s ?>)</span>
+                    <span class="green-text">reste (<?= $s - $member->social_crown ?>)</span>
+
                     <?php
                     else:
                     ?>
-                    <span class="text-secondary">Non payé</span>
+                    <span class="text-secondary">non payé </span>
                     <?php
                     endif;
                     ?>
@@ -107,6 +114,31 @@ $user = $member->user();
                     endif;
                     ?>
                 </div>
+                <div class="col-12 text-right">
+                
+                <button class="btn btn-danger m-0 p-2" data-toggle="modal" data-target="#modal">supprimer</button>
+                    <div class="modal  fade" id="modal" tabindex="-1" role="dialog"
+                     aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+
+                                <p class="text-center">Êtes-vous sûr(e) de vouloir supprimer ce membre?
+                                </p>
+
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Non</button>
+                                    <a href="<?=Yii::getAlias("@administrator.delete_member")."?q=".$member->id?>" class="btn btn-primary">Oui</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+
+    
             </div>
         </div>
     </div>
@@ -117,7 +149,10 @@ $user = $member->user();
                     <a href="<?= Yii::getAlias("@administrator.member")."?q=".$member->id ?>">Général</a>
                 </h5>
                 <h5 class="col">
-                    <a class="black-link" href="<?= Yii::getAlias("@administrator.saving_member")."?q=".$member->id ?>">Epargnes</a>
+                    <a class="black-link" href="<?= Yii::getAlias("@administrator.saving_member")."?q=".$member->id ?>">Épargnes</a>
+                </h5>
+                <h5 class="col">
+                    <a class="black-link" href="<?= Yii::getAlias("@administrator.tontine_member")."?q=".$member->id ?>">Tontines</a>
                 </h5>
                 <h5 class="col">
                     <a class="black-link" href="<?= Yii::getAlias("@administrator.borrowing_member")."?q=".$member->id ?>">Emprunts</a>
@@ -141,8 +176,8 @@ $user = $member->user();
                         <th>Montant épargné</th>
                         <th>Montant emprunté</th>
                         <th>Montant remboursé</th>
-                        <th>Intérêt</th>
-                        <th>Total obtenu</th>
+                        <th>Intérêt sur les dettes</th>
+                        <th>Fonds</th>
                     </tr>
 
                     </thead>
@@ -154,15 +189,15 @@ $user = $member->user();
                         $refundedAmount = $member->refundedAmount($exercise);
                         $interest = $member->interest($exercise);
 
-                        $total = $savedAmount+$interest;
+                        $total = $savedAmount+ round($interest);
                         ?>
                         <tr>
                             <th scope="row"><?= $exercise->year ?></th>
                             <td><?= $savedAmount?$savedAmount:0 ?> XAF</td>
                             <td><?= $borrowingAmount?$borrowingAmount:0 ?> XAF</td>
                             <td><?= $refundedAmount?$refundedAmount:0 ?> XAF</td>
-                            <td><?= $interest?$interest:0 ?> XAF</td>
-                            <td class="blue-text"><?= $exercise->active?"###": ($total .' XAF') ?></td>
+                            <td><?= $interest? round($interest):0 ?> XAF</td>
+                            <td class="blue-text"><?= ($total .' XAF') ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

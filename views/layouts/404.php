@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Html;
-$this->title = "Mutuelle - ENSP";
+$this->title = "Mutuelle - ENSPY";
 ?>
 
 <?php $this->beginPage() ?>

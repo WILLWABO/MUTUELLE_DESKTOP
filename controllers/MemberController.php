@@ -16,10 +16,12 @@ use app\managers\RedirectionManager;
 use app\models\Member;
 use app\models\User;
 use app\models\Saving;
+use app\models\Tontine;
 use app\models\forms\IdForm;
 use app\models\forms\NewBorrowingForm;
 use app\models\forms\NewRefundForm;
 use app\models\forms\NewSavingForm;
+use app\models\forms\NewTontineForm;
 use app\models\forms\NewSessionForm;
 use app\models\Administrator;
 use app\models\Help_type;
@@ -133,7 +135,6 @@ class MemberController extends Controller
         $user = User::findOne(\Yii::$app->user->getId());
         $member = Member::findOne(['user_id'=> $user->id]);
         $socialModel = new UpdateSocialInformationForm();
-        $passwordModel = new UpdatePasswordForm();
 
         $socialModel->attributes = [
             'username' => $this->member->username,
@@ -144,15 +145,20 @@ class MemberController extends Controller
             'address' => $this->user->address,
         ];
 
-        return $this->render('modifier_profil',compact('socialModel','passwordModel'));
+        return $this->render('modifier_profil',compact('socialModel'));
         
+    }
+
+    public function actionModifierPassword() {
+        MemberSessionManager::setProfil();
+        $passwordModel = new UpdatePasswordForm();
+        return $this->render('modifier_password',compact('passwordModel'));
     }
 
     public function actionEnregistrerModifierProfil() {
         MemberSessionManager::setProfil();
         if (\Yii::$app->request->getIsPost()) {
             $socialModel = new UpdateSocialInformationForm();
-            $passwordModel = new UpdatePasswordForm();
 
             if ($socialModel->load(\Yii::$app->request->post()) &&  $socialModel->validate()) {
                 $this->user->name = $socialModel->name;
@@ -160,16 +166,26 @@ class MemberController extends Controller
                 $this->user->tel = $socialModel->tel;
                 $this->user->email = $socialModel->email;
                 $this->user->address = $socialModel->address;
-                if (UploadedFile::getInstance($socialModel,"avatar"))
+              /*  if (UploadedFile::getInstance($socialModel,"avatar"))
                     $this->user->avatar = FileManager::storeAvatar( UploadedFile::getInstance($socialModel,"avatar"),$socialModel->username,"MEMBER");
-
+*/
+            if (UploadedFile::getInstance($socialModel,"avatar"))
+                {
+                     $this->user->avatar=UploadedFile::getInstance($socialModel,'avatar');
+                    $this->user->avatar->saveAs('img/upload/'.$this->user->avatar->basename.'.'.$this->user->avatar->extension);
+                    $socialModel->avatar=$this->user->avatar->basename.'.'.$this->user->avatar->extension;
+                }
+            else{
+                    $this->user->avatar=null;
+                }
+ 
                 $this->user->save();
                 $this->member->username = $socialModel->username;
                 $this->member->save();
                 return $this->redirect("@member.profil");
             }
             else
-                return $this->render('modifier_profil',compact('socialModel','passwordModel'));
+                return $this->render('modifier_profil',compact('socialModel'));
 
         }
         else
@@ -182,15 +198,6 @@ class MemberController extends Controller
     public function actionModifierMotDePasse() {
         MemberSessionManager::setProfil();
         if (\Yii::$app->request->getIsPost()) {
-            $socialModel = new UpdateSocialInformationForm();
-            $socialModel->attributes = [
-                'username' => $this->member->username,
-                'name' => $this->user->name,
-                'first_name' => $this->user->first_name,
-                'tel' => $this->user->tel,
-                'email' => $this->user->email,
-                'address' => $this->user->address,
-            ];
 
             $passwordModel = new UpdatePasswordForm();
             if ($passwordModel->load(\Yii::$app->request->post()) &&  $passwordModel->validate()) {
@@ -201,16 +208,16 @@ class MemberController extends Controller
                 }
                 else {
                     $passwordModel->addError('password','Le mot de passe ne correspond pas');
-                    return $this->render('modifier_profil',compact('socialModel','passwordModel'));
+                    return $this->render('modifier_password',compact('passwordModel'));
                 }
 
             }
             else
-                return $this->render('modifier_profil',compact('socialModel','passwordModel'));
+                return $this->render('modifier_password',compact('passwordModel'));
 
         }
         else
-            return RedirectionManager::abort($this);;
+            return RedirectionManager::abort($this);
     }
 
     public function actionTypesAide() {
@@ -225,6 +232,12 @@ class MemberController extends Controller
         $member = Member::findOne(['user_id'=> $user->id]);
         $members = Member::findBySql('Select * from member where id != '.$member->id)->all();
         return $this->render('members',compact('members'));
+    }
+
+    public function actionListeMembres() {
+        MemberSessionManager::setMembers();
+        $members = Member::find()->all();
+        return $this->render('members_list',compact('members'));
     }
 
     public function actionAdministrators() {
@@ -250,6 +263,24 @@ class MemberController extends Controller
             ->all();
 
         return $this->render("epargnes",compact("exercises","pagination","member"));
+    }
+
+    public function actionTontineMembre() {
+        MemberSessionManager::setHome("tontine_member");
+        $user = User::findOne(\Yii::$app->user->getId());
+        $member = Member::findOne(['user_id'=> $user->id]);        
+        $query = Exercise::find();            
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $query->count(),
+        ]);
+
+        $exercises = $query->orderBy(['created_at'=> SORT_DESC])
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+        return $this->render("tontine_member",compact("member","exercises","pagination"));
+          
     }
 
     public function actionEmprunts() {
@@ -293,20 +324,6 @@ class MemberController extends Controller
             ->limit($pagination->limit)
             ->all();
         return $this->render("sessions",compact('exercises','pagination'));
-    }
-
-    public function actionDetailSession($q = 0) {
-        MemberSessionManager::setHome("sessions");
-        if ($q) {
-            $session = Session::findOne($q);
-            if ($session) {
-                return $this->render("detailsession",compact('session'));
-            }
-            else
-                return RedirectionManager::abort($this);
-        }
-        else
-            return RedirectionManager::abort($this);
     }
 
     public function actionExercises() {

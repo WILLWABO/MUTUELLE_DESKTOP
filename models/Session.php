@@ -22,6 +22,15 @@ class Session extends ActiveRecord
         return Saving::find()->where(['session_id' => $this->id])->sum('amount');
     }
 
+    public function tontinedAmount(){
+        return Tontine::find()->where(['session_id' => $this->id])->sum('amount');
+    }
+
+    public function interest() {
+        $amount =(int) Borrowing::find()->select('ceil(sum(amount*interest/100))')->where(['session_id' => $this->id])->column()[0];
+        return $amount;
+    }
+
     public function borrowedAmount() {
         return Borrowing::find()->where(['session_id' => $this->id])->sum('amount');
     }

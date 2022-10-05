@@ -19,7 +19,7 @@ class Borrowing extends ActiveRecord
     }
 
     public function intendedAmount() {
-        return $this->amount+($this->interest/100.0)*$this->amount;
+        return $this->amount+ 3*($this->interest/100.0)*$this->amount;
     }
 
     public function administrator() {

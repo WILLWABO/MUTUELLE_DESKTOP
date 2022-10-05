@@ -51,25 +51,29 @@ Mes contributions
                         <th>Administrateur</th>
                         <th>Membre aidé</th>
                         <th>Motif</th>
+                        <th>Réglée</th>
                     </tr>
                 </thead>
             
                 <tbody>
                     <?php foreach ($contributions as $index => $contribution): 
-                    $admin = Administrator::findOne(['id'=> $contribution->administrator_id]);
+                    // $admin = Administrator::findOne(['id'=> $contribution->administrator_id]);
                     $help = Help::findOne(['id'=> $contribution->help_id]);
                     $helptype = Help_type::findOne(['id'=> $help->help_type_id]);
                     $member = Member::findOne(['id'=> $help->member_id]);
+                    $administrator = $contribution->administrator();
+                    $administratorUser = $administrator?$administrator->user():null;
                     //$session = Session::findOne(['id'=> $borrowing->session_id]);
                     //$exercise = Exercise::findOne(['id'=> $session->exercise_id]); ?>
 
                         <tr>
-                            <th scope="row" class="blue-text"><?= $index + 1 ?></th>
+                            <th scope="row" ><?= $index + 1 ?></th>
                             <td ><?= $help->unit_amount ?> XAF</td>
-                            <td><?= $contribution->date ?></td>
-                            <td><?= $admin->username ?></td>
+                            <td><?= (new DateTime($contribution->date))->format("d-m-Y") ?></td>
+                            <td class="text-capitalize"><?=$administratorUser?$administratorUser->name . " " . $administratorUser->first_name: "###" ?></td>
                             <td class="text-secondary"><?= $member->username ?></td>
                             <td class="text-secondary"><?= $helptype->title ?></td>
+                            <td class="text-capitalize"><?=$administratorUser?"Oui": "Non" ?></td>
                                     
                         </tr>
                     <?php endforeach; ?>

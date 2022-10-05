@@ -44,7 +44,7 @@ Exercices
                             <th>Montant emprunté</th>
                             <th>Montant remboursé</th>
                             <th>Intérêt</th>
-                            <th>Total obtenu</th>
+                            <th>Fonds</th>
                         </tr>
 
                     </thead>
@@ -63,8 +63,8 @@ Exercices
                                 <td><?= $savedAmount?$savedAmount:0 ?> XAF</td>
                                 <td><?= $borrowingAmount?$borrowingAmount:0 ?> XAF</td>
                                 <td><?= $refundedAmount?$refundedAmount:0 ?> XAF</td>
-                                <td><?= $interest?$interest:0 ?> XAF</td>
-                                <td class="blue-text"><?= $exercise->active?"###": ($total .' XAF') ?></td>
+                                <td><?= $interest? round($interest) : 0 ?> XAF</td>
+                                <td class="blue-text"><?= ($savedAmount?$savedAmount:0) + round($interest) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

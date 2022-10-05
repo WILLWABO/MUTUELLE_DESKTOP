@@ -22,6 +22,7 @@ class m181222_181147_create_help_table extends Migration
             'administrator_id' => $this->integer()->unsigned(),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
             'help_type_id' => $this->integer()->unsigned(),
+            'session_id' => $this->integer()->unsigned(),
             'member_id' => $this->integer()->unsigned()
         ]);
     }

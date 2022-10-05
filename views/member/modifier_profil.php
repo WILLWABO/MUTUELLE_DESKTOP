@@ -23,34 +23,13 @@ Profil
         <?= $form1->field($socialModel,'name')->input('text',['required' => 'required'])->label('Nom') ?>
         <?= $form1->field($socialModel,'tel')->input('tel',['required'=>'required'])->label("Téléphone") ?>
         <?= $form1->field($socialModel,'email')->input('email',['required'=> 'required'])->label('Email')?>
-        <?= $form1->field($socialModel,'address')->input('address',['required'=> 'required'])->label('Adresse')?>
-        <?= $form1->field($socialModel,'avatar')->fileInput(['accept'=>'png,jpg,jpeg,gif'])->label('Photo de profil')?>
+        <?= $form1->field($socialModel,'address')->input('address')->label('Adresse')?>
+        <?= $form1->field($socialModel,'avatar')->fileInput();?>
 
         <div class="form-group text-right">
-            <button class="btn-primary btn" data-toggle="modal" data-target="#changePassword">Modifier mot de passe</button>
             <button type="submit" class="btn btn-primary">Enregistrer</button>
         </div>
 
-        <?php \yii\widgets\ActiveForm::end()?>
-
-    </div>
-</div>
-<div class="modal fade" id="changePassword" tabindex="-1" role="dialog"
-    aria-labelledby="changePasswordLabel" aria-hidden="true">
-    <div class=" modal-dialog" role="document" style="background : #fff;">
-        <?php $form2 = \yii\widgets\ActiveForm::begin(['method' => 'post',
-                'action' => '@member.enregistrer_modifier_profil',
-                'options' => ['enctype' => 'multipart/form-data','class' => 'modal-body'],
-                'errorCssClass' => 'text-secondary'
-            ])?>
-            <?= $form2->field($passwordModel,'password')->input('password',['required'=> 'required'])->label('Ancien mot de passe') ?>
-            <?= $form2->field($passwordModel,'new_password')->input('password',['required'=> 'required'])->label('Nouveau mot de passe') ?>
-            <?= $form2->field($passwordModel,'confirmation_new_password')->input('password',['required'=>'required'])->label('Confirmation du nouveau mot de passe') ?>
-
-            <div class="form-group text-right modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">retour</button>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-            </div>
-            <?php \yii\widgets\ActiveForm::end()?>
+        <?php \yii\widgets\ActiveForm::end()?>    
     </div>
 </div>

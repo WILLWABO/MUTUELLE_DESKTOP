@@ -76,7 +76,8 @@ Mon profil
             </div>
             <div class="row mt-5">
                 <div class="col-12 text-center">
-                    <a href="<?= Yii::getAlias("@member.modifier_profil") ?>" class="btn btn-primary">Modifier</a>
+                    <a href="<?= Yii::getAlias("@member.modifier_profil") ?>" class="btn btn-primary">Modifier profil</a>
+                    <a href="<?= Yii::getAlias("@member.modifier_password") ?>" class="btn btn-primary">Modifier mot de passe</a>
                 </div>
             </div>
         </div>

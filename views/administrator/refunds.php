@@ -55,7 +55,7 @@ Remboursements
                                     ]) ?>
                                     <?= $form->field($model, 'member_id')->dropDownList($items)->label("Membre") ?>
 
-                                    <?= $form->field($model, "amount")->label("Montant")->input("number", ['required' => 'required']) ?>
+                                    <?= $form->field($model, "amount")->label("Montant")->input("number", ['required' => 'required', 'min'=>0]) ?>
 
                                     <?= $form->field($model, 'session_id')->hiddenInput(['value' => $activeSession->id])->label(false) ?>
                                     <div class="form-group text-right">
@@ -114,14 +114,14 @@ Remboursements
                                 $borrowing = $refund->borrowing();
                                 ?>
                             <?php
-                            if ($session->active && $session->state == "REFUNDS"):
-                                $r = $borrowing->intendedAmount()-$borrowing->refundedAmount();
+                            $rest = $borrowing->intendedAmount() - \app\models\Refund::find()->where(['<=','session_id',$session->id])->andWhere(['member_id'=>$member->id])->sum('amount');
+                            if ($session->active && $session->state == "REFUND"):
                             ?>
                                 <tr data-target="#modalS<?= $refund->id?>" data-toggle="modal">
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td class="text-capitalize"><?= $memberUser->name . " " . $memberUser->first_name ?></td>
                                     <td class="blue-text"><?= $refund->amount ?> XAF</td>
-                                    <th><?= ($r > 0)? $r:0  ?> XAF</th>
+                                    <th><?= ($rest > 0)? $rest:0  ?> XAF</th>
                                     <td class="text-capitalize"><?= $administratorUser->name . " " . $administratorUser->first_name ?></td>
                                 </tr>
 
@@ -142,21 +142,15 @@ Remboursements
                                         </div>
                                     </div>
                                 </div>
-
-
-                            <?php
-                                    else:
-                            ?>
-                                        <tr>
-                                            <th scope="row"><?= $index + 1 ?></th>
-                                            <td class="text-capitalize"><?= $memberUser->name . " " . $memberUser->first_name ?></td>
-                                            <td class="blue-text"><?= $refund->amount ?> XAF</td>
-                                            <th><?= $borrowing->intendedAmount()-$borrowing->refundedAmount() ?> XAF</th>
-                                            <td class="text-capitalize"><?= $administratorUser->name . " " . $administratorUser->first_name ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
-                            ?>
+                            <?php else: ?>
+                                <tr>
+                                    <th scope="row"><?= $index + 1 ?></th>
+                                    <td class="text-capitalize"><?= $memberUser->name . " " . $memberUser->first_name ?></td>
+                                    <td class="blue-text"><?= $refund->amount ?> XAF</td>
+                                    <th><?= ($rest > 0)? $rest:0  ?> XAF</th>
+                                    <td class="text-capitalize"><?= $administratorUser->name . " " . $administratorUser->first_name ?></td>
+                                </tr>
+                            <?php endif; ?>
 
                             <?php endforeach; ?>
                             </tbody>

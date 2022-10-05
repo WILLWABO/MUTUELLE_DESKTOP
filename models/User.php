@@ -7,6 +7,8 @@ use yii\db\ActiveRecord;
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
 
+    public $username;
+    
     public function getUser() {
         return static::findOne($this->getId());
     }

@@ -28,7 +28,7 @@ Aides
 <div class="container mt-5 mb-5">
     <div class="row mb-2">
         <div class="col-12 white-block text-center blue-gradient ">
-            <h3 class="text-white">Fond social</h3>
+            <h3 class="text-white">Fonds(social && inscription)</h3>
             <h1 id="saving-amount-title">
                 <?=  ($t=\app\managers\FinanceManager::socialCrown())? ($t>0?$t:0) :0 ?> XAF
             </h1>
@@ -62,7 +62,7 @@ Aides
                                             <h2><?= $help->contributedAmount() ?> XAF</h2>
                                             <h5 class="blue-text"><i class="fas fa-user"></i> <?= $user->name." ".$user->first_name ?></h5>
                                             <p class="card-title"><strong><?= $helpType->title ?></strong></p>
-                                            <a class="btn btn-primary" href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id ?>"><i class="fas fa-clone left"></i> Details</a>
+                                            <a class="btn btn-primary" href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id ?>"><i class="fas fa-clone left"></i> Détails</a>
                                         </div>
                                     </div>
                                 </div>
@@ -108,7 +108,7 @@ Aides
                                 <p  class="mb-5"><?= $help->unit_amount ?> XAF / membre</p>
                                 <h5 class="blue-text"><i class="fas fa-user"></i> <?= $user->name." ".$user->first_name ?></h5>
                                 <p class="card-title pt-2"><strong><?= $helpType->title ?></strong></p>
-                                <a class="btn btn-primary" href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id ?>"><i class="fas fa-clone left"></i> Details</a>
+                                <a class="btn btn-primary" href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id ?>"><i class="fas fa-clone left"></i> Détails</a>
                             </div>
                         </div>
                     </div>

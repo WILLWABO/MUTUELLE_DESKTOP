@@ -55,7 +55,7 @@ Accueil
                                 <br>
                                 <span style="font-size: 1.5rem" class="text-secondary"><?= ($t=$help->contributedAmount())?$t:0?> / <?= $help->amount?>  XAF</span>
                                 <div class="text-right">
-                                    <a href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id?>" class="btn btn-primary p-2">Details</a>
+                                    <a href="<?= Yii::getAlias("@member.help_details")."?q=".$help->id?>" class="btn btn-primary p-2">Détails</a>
                                 </div>
                             </div>
                         </div>
