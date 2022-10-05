@@ -481,8 +481,7 @@ class AdministratorController extends Controller
 
                    /*try{
                         Yii::$app->mailer->compose()
-                        ->setTo($user->email)
-                        ->setFrom('jasonmfououoyono@gmail.com')
+                        ->setTo($user->email)git init
                         ->setSubject('Confirmation de création de compte de membre')
                         ->setTextBody("Bienvenue à la mutuelle des enseignants de l'école nationale supérieure polytechnique de Yaoundé")
                         ->send();
